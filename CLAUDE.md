@@ -61,5 +61,5 @@ pausa con Esc y reinicio (`SceneManager.LoadScene`). `MouseLook` y `Weapon` igno
 `Time.timeScale == 0` (no mover cámara ni disparar en pausa/game over).
 Scripts en `Assets/Scripts/`: `PlayerMovement`, `MouseLook`, `Weapon`, `EnemyHealth`, `EnemyAI`,
 `EnemySpawner`, `PlayerHealth`, `HUD`, `GameManager` — todo con el **Input System nuevo**.
-Siguiente: **Fase 5.5 — El escenario** (mapa con ProBuilder + niveles, lo modela el autor),
-luego **Fase 6 — Pulido**.
+Siguiente: **Fase 6 — Pulido** (sonido, partículas, animación). El mapa (ProBuilder + niveles)
+se movió al **backlog v2.0** (ver ROADMAP) por decisión del autor.

@@ -49,18 +49,21 @@ Leyenda: ✅ hecho · 🟡 en progreso · ⬜ pendiente
   recarga la escena (`SceneManager.LoadScene`). `MouseLook` y `Weapon` ignoran input con
   `Time.timeScale == 0` (no mover cámara ni disparar en pausa/game over)
 
-## Fase 5.5 — El escenario ⬜
-> Objetivo del autor: un mapa **bueno**, con niveles o subniveles. El autor modelará
-> dentro de Unity (tiene **ProBuilder**). El agente guía y verifica por MCP.
-- [ ] Greybox del nivel con ProBuilder (paredes, rampas, cobertura, salas)
-- [ ] Marcar geometría como obstáculo + **re-hornear el NavMesh** (los enemigos rodean)
-- [ ] Niveles / subniveles: estructura de escenas o zonas + transiciones (puertas/triggers)
-- [ ] Iluminación y ambiente básico del escenario
-
 ## Fase 6 — Pulido ⬜
-- [ ] Sonidos (disparo, impactos)
-- [ ] Partículas (muzzle flash, sangre/chispas)
-- [ ] Animaciones básicas
+Orden acordado: **1) partículas → 2) sonidos → 3) animaciones** (las partículas no
+dependen de assets externos; los sonidos necesitan clips que aporta el autor).
+- [ ] Partículas (muzzle flash al disparar + chispas en el impacto, reusando `hit.point`)
+- [ ] Sonidos (disparo, impacto, recarga) — requiere clips de audio (`.wav`)
+- [ ] Animaciones básicas (retroceso/recoil del arma al disparar)
+
+---
+
+## Backlog v2.0 (mejoras futuras, fuera del alcance v1)
+> No estaban en el plan original; se dejan para una posible v2.0.
+- **El escenario**: mapa bueno con niveles/subniveles, modelado con **ProBuilder**
+  (paredes, rampas, cobertura, salas) + re-hornear NavMesh para que los enemigos rodeen;
+  transiciones entre zonas (puertas/triggers). Lo modelaría el autor; el agente guía.
+- Patrulla de enemigos cuando no persiguen · oleadas de spawns · object pooling de impactos.
 
 ---
 
@@ -69,5 +72,4 @@ Leyenda: ✅ hecho · 🟡 en progreso · ⬜ pendiente
 (raycast/impacto/munición) + enemigos que se generan (`EnemySpawner`), te persiguen por
 NavMesh y te atacan; HUD de vida/munición, mira, y **victoria/derrota** con game over real
 (`GameManager` congela el juego y muestra panel GANASTE/PERDISTE).
-Siguiente: **Fase 5.5 — El escenario** (mapa con ProBuilder + niveles, lo modela el autor),
-y luego **Fase 6 — Pulido** (sonido, partículas, animación).
+Siguiente: **Fase 6 — Pulido** (sonido, partículas, animación). El mapa pasa al backlog v2.0.
