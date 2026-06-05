@@ -7254,6 +7254,9 @@ GameObject:
   - component: {fileID: 1482782262}
   - component: {fileID: 1482782264}
   - component: {fileID: 1482782265}
+  - component: {fileID: 1482782268}
+  - component: {fileID: 1482782267}
+  - component: {fileID: 1482782266}
   m_Layer: 0
   m_Name: Weapon
   m_TagString: Untagged
@@ -7352,30 +7355,8 @@ MonoBehaviour:
   hitMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  impactPrefab: {fileID: 6042170179556387630, guid: 546f583b21666e145b5cad94a78e6c6e, type: 3}
-  impactLifetime: 5
   magazineSize: 12
   reloadTime: 1.5
-  muzzleFlash: {fileID: 933630101}
-  impactSparks: {fileID: 8990252747512228723, guid: 580a28dcbf75b8c458effb63cf8316bf, type: 3}
-  fireClips:
-  - {fileID: 8300000, guid: 2292bd398a553ce449a2cb72fdec6139, type: 3}
-  emptyClip: {fileID: 8300000, guid: d5d8402eb7744404085a9dd7413d14c0, type: 3}
-  reloadClip: {fileID: 8300000, guid: 20c8829b695028b49a1c118614767cea, type: 3}
-  concreteImpactClips:
-  - {fileID: 8300000, guid: 85b71344edb9cd44596d436a7c25e780, type: 3}
-  - {fileID: 8300000, guid: 36232461d0651fb41938a0796383cc8a, type: 3}
-  - {fileID: 8300000, guid: 203ad05061ba83649aa8b662678f8134, type: 3}
-  - {fileID: 8300000, guid: 25f133b488e86f640b75865b194cfe43, type: 3}
-  fleshImpactClips:
-  - {fileID: 8300000, guid: 4dc3a3023649a644b80124e116615318, type: 3}
-  - {fileID: 8300000, guid: 8c09db39c0ee1ed4a82ac9d6dcdbe843, type: 3}
-  - {fileID: 8300000, guid: c24c36b16c3712f4aa1684aebdbae587, type: 3}
-  - {fileID: 8300000, guid: b7d8ac3521f392a4786043565d859292, type: 3}
-  - {fileID: 8300000, guid: 203e8427623d3b94b970d345dffc160b, type: 3}
-  recoilKickback: 0.06
-  recoilPitch: 0
-  recoilReturnSpeed: 10
 --- !u!82 &1482782265
 AudioSource:
   m_ObjectHideFlags: 0
@@ -7473,6 +7454,64 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1482782266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482782259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7996164d1acee6f48ae523f2344fafd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponEffects
+  muzzleFlash: {fileID: 933630101}
+  impactSparks: {fileID: 8990252747512228723, guid: 580a28dcbf75b8c458effb63cf8316bf, type: 3}
+  impactMark: {fileID: 6042170179556387630, guid: 546f583b21666e145b5cad94a78e6c6e, type: 3}
+  impactLifetime: 5
+--- !u!114 &1482782267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482782259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3fc73e8c9ec3c94da3dfeb507a3c577, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAudio
+  fireClips:
+  - {fileID: 8300000, guid: 2292bd398a553ce449a2cb72fdec6139, type: 3}
+  emptyClip: {fileID: 8300000, guid: d5d8402eb7744404085a9dd7413d14c0, type: 3}
+  reloadClip: {fileID: 8300000, guid: 20c8829b695028b49a1c118614767cea, type: 3}
+  concreteImpactClips:
+  - {fileID: 8300000, guid: 85b71344edb9cd44596d436a7c25e780, type: 3}
+  - {fileID: 8300000, guid: 36232461d0651fb41938a0796383cc8a, type: 3}
+  - {fileID: 8300000, guid: 203ad05061ba83649aa8b662678f8134, type: 3}
+  - {fileID: 8300000, guid: 25f133b488e86f640b75865b194cfe43, type: 3}
+  fleshImpactClips:
+  - {fileID: 8300000, guid: 4dc3a3023649a644b80124e116615318, type: 3}
+  - {fileID: 8300000, guid: 8c09db39c0ee1ed4a82ac9d6dcdbe843, type: 3}
+  - {fileID: 8300000, guid: c24c36b16c3712f4aa1684aebdbae587, type: 3}
+  - {fileID: 8300000, guid: b7d8ac3521f392a4786043565d859292, type: 3}
+  - {fileID: 8300000, guid: 203e8427623d3b94b970d345dffc160b, type: 3}
+--- !u!114 &1482782268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482782259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a06181bc2cb36243bb24a78211711ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponRecoil
+  kickback: 0.06
+  pitch: 0
+  returnSpeed: 10
 --- !u!1 &1621509577
 GameObject:
   m_ObjectHideFlags: 0
