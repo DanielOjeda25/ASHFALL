@@ -26,7 +26,16 @@ public abstract class Health : MonoBehaviour, IDamageable
     // pero deben llamar a base.Awake() para inicializar la vida.
     protected virtual void Awake()
     {
+        ResetState();
+    }
+
+    // Reinicia vida y estado de muerte. Se usa al nacer y, sobre todo, al REUTILIZAR
+    // un objeto del pool (Awake solo corre la primera vez en la vida del GameObject;
+    // al reactivar uno reciclado hay que "revivirlo" a mano).
+    protected void ResetState()
+    {
         currentHealth = maxHealth;
+        isDead = false;
     }
 
     public void TakeDamage(int amount)

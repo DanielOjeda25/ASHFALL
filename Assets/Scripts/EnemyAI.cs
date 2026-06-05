@@ -30,10 +30,12 @@ public class EnemyAI : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
     }
 
-    void Start()
+    // OnEnable (no Start): asi tambien se reinicializa al REACTIVAR un enemigo
+    // reciclado del pool (Start solo corre una vez en la vida del objeto).
+    void OnEnable()
     {
         // Si nadie nos asigno un target, usamos el localizador del jugador (O(1),
-        // sin escanear la escena). Se resuelve una vez al nacer.
+        // sin escanear la escena).
         if (target == null && PlayerHealth.Current != null)
             target = PlayerHealth.Current.transform;
 

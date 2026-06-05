@@ -21,6 +21,13 @@ public class EnemySpawner : MonoBehaviour
     // Intentos por enemigo para encontrar un punto bueno antes de rendirse.
     public int maxSpawnAttempts = 20;
 
+    private EnemyPool pool;  // recicla enemigos (creado en Awake, sin cablear en editor)
+
+    void Awake()
+    {
+        pool = new EnemyPool(enemyPrefab, transform);
+    }
+
     // Llamado por el WaveSystem: instancia n enemigos repartidos por el area.
     public void SpawnEnemies(int n)
     {
@@ -54,7 +61,7 @@ public class EnemySpawner : MonoBehaviour
             // Punto valido: spawneamos sobre el NavMesh y mantenemos la altura de
             // la capsula (centro a spawnHeight sobre el suelo encontrado).
             Vector3 pos = new Vector3(hit.position.x, hit.position.y + spawnHeight, hit.position.z);
-            Instantiate(enemyPrefab, pos, Quaternion.identity);
+            pool.Get(pos, Quaternion.identity);   // reutiliza si hay; si no, crea uno
             return;
         }
 
