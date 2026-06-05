@@ -1,20 +1,21 @@
 using UnityEngine;
 
-// Genera varios enemigos al empezar, en posiciones aleatorias alrededor de este objeto.
-// Va en un GameObject vacio (ej. "EnemySpawner").
+// Genera enemigos en posiciones aleatorias alrededor de este objeto. Ya NO genera
+// solo en Start: es una herramienta que el WaveSystem invoca por oleada
+// (SpawnEnemies). Va en un GameObject vacio (ej. "EnemySpawner").
 public class EnemySpawner : MonoBehaviour
 {
     [Header("Que generar")]
     public GameObject enemyPrefab;    // arrastra aqui el prefab del Enemy
 
-    [Header("Cuantos y donde")]
-    public int count = 5;             // cuantos enemigos generar
+    [Header("Donde")]
     public float areaRadius = 20f;    // radio (en metros) alrededor del spawner
     public float spawnHeight = 1f;    // altura Y (centro de la capsula = 1)
 
-    void Start()
+    // Llamado por el WaveSystem: instancia n enemigos repartidos por el area.
+    public void SpawnEnemies(int n)
     {
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < n; i++)
             SpawnOne();
     }
 

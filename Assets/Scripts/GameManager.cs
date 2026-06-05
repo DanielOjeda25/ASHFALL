@@ -3,12 +3,13 @@ using UnityEngine.SceneManagement;  // para recargar la escena (reiniciar)
 using UnityEngine.InputSystem;      // tecla Escape (Input System nuevo)
 using TMPro; // TextMeshPro
 
-// El "arbitro" del juego: lleva la cuenta de enemigos vivos y decide victoria/derrota.
+// El "arbitro" del juego: gestiona derrota, pausa y la UI de fin. La VICTORIA y el
+// recuento de enemigos los lleva el WaveSystem (que llama a TriggerVictory()).
 // Va en un GameObject vacio "GameManager".
 public class GameManager : MonoBehaviour
 {
-    // Singleton: una referencia estatica para que cualquier script (EnemyHealth,
-    // PlayerHealth) pueda avisar al GameManager sin tener que arrastrarlo en el Inspector.
+    // Singleton: referencia global para utilidades y para que el WaveSystem dispare
+    // la victoria sin arrastrarlo en el Inspector.
     public static GameManager Instance { get; private set; }
 
     [Header("Game Over (UI)")]
@@ -18,7 +19,6 @@ public class GameManager : MonoBehaviour
     [Header("Pausa (UI)")]
     public GameObject pausePanel;     // panel de pausa (empieza apagado)
 
-    private int enemiesAlive;
     private bool gameOver;
     private bool isPaused;
 
@@ -28,19 +28,14 @@ public class GameManager : MonoBehaviour
         Instance = this;
     }
 
-    // Nos suscribimos a los eventos de vida. Los enemigos se generan en el Start
-    // del spawner (despues de estos OnEnable), asi que no perdemos ningun nacimiento.
+    // Solo nos importa la muerte del jugador (derrota). Los enemigos los cuenta el WaveSystem.
     void OnEnable()
     {
-        EnemyHealth.Spawned += HandleEnemySpawned;
-        EnemyHealth.Killed += HandleEnemyKilled;
         PlayerHealth.PlayerDied += HandlePlayerDied;
     }
 
     void OnDisable()
     {
-        EnemyHealth.Spawned -= HandleEnemySpawned;
-        EnemyHealth.Killed -= HandleEnemyKilled;
         PlayerHealth.PlayerDied -= HandlePlayerDied;
     }
 
@@ -57,32 +52,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // ---------- Reacciones a eventos de vida ----------
-
-    void HandleEnemySpawned(EnemyHealth enemy)
-    {
-        enemiesAlive++;
-    }
-
-    void HandleEnemyKilled(EnemyHealth enemy)
-    {
-        enemiesAlive--;
-        Debug.Log($"Enemigos restantes: {enemiesAlive}");
-
-        if (enemiesAlive <= 0)
-            Win();
-    }
+    // ---------- Reacciones a eventos / API publica ----------
 
     void HandlePlayerDied()
     {
         Lose();
     }
 
-    void Win()
+    // Lo llama el WaveSystem cuando se completa la ultima oleada (modo finito).
+    public void TriggerVictory()
     {
         if (gameOver) return; // evita repetir
         gameOver = true;
-        Debug.Log("=== VICTORIA: todos los enemigos eliminados ===");
+        Debug.Log("=== VICTORIA: todas las oleadas superadas ===");
         ShowGameOver("GANASTE");
     }
 

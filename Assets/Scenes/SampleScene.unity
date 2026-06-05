@@ -7722,6 +7722,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1902528917}
   - component: {fileID: 1902528916}
+  - component: {fileID: 1902528918}
   m_Layer: 0
   m_Name: EnemySpawner
   m_TagString: Untagged
@@ -7742,7 +7743,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   enemyPrefab: {fileID: 2831840330880355044, guid: 8b26e7b3b621c7e43a09aa9a5cb3f869, type: 3}
-  count: 5
   areaRadius: 20
   spawnHeight: 1
 --- !u!4 &1902528917
@@ -7760,6 +7760,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1902528918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1902528915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7088fd2ae2f501c4d8a6e0f73f7a042f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WaveSystem
+  totalWaves: 0
+  baseEnemies: 5
+  enemiesGrowthPerWave: 3
+  timeBetweenWaves: 3
+  firstWaveDelay: 2
+  spawner: {fileID: 1902528916}
 --- !u!1 &1933246119
 GameObject:
   m_ObjectHideFlags: 0
