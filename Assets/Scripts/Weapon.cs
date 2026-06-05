@@ -33,6 +33,7 @@ public class Weapon : MonoBehaviour
     public event Action DryFired;               // clic sin municion
     public event Action ReloadStarted;          // empieza la recarga
     public event Action<RaycastHit, bool> Hit;  // (info del golpe, golpeoAlgoDanable)
+    public event Action AmmoChanged;            // municion o estado de recarga cambio (para el HUD)
 
     void Awake()
     {
@@ -45,6 +46,7 @@ public class Weapon : MonoBehaviour
     {
         // Empezamos con el cargador lleno.
         currentAmmo = magazineSize;
+        AmmoChanged?.Invoke();   // valor inicial para el HUD
     }
 
     void Update()
@@ -85,6 +87,7 @@ public class Weapon : MonoBehaviour
         currentAmmo--;
         Debug.Log($"Disparo. Balas: {currentAmmo}/{magazineSize}");
         Fired?.Invoke();
+        AmmoChanged?.Invoke();
 
         // Rayo desde el centro de la camara hacia delante.
         Vector3 origin = fpsCamera.transform.position;
@@ -118,11 +121,13 @@ public class Weapon : MonoBehaviour
         isReloading = true;
         Debug.Log("Recargando...");
         ReloadStarted?.Invoke();
+        AmmoChanged?.Invoke();   // el HUD muestra "RECARGANDO..."
 
         yield return new WaitForSeconds(reloadTime);
 
         currentAmmo = magazineSize;
         isReloading = false;
         Debug.Log($"Recargado. Balas: {currentAmmo}/{magazineSize}");
+        AmmoChanged?.Invoke();   // el HUD vuelve a mostrar el numero
     }
 }
