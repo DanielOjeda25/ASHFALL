@@ -13,6 +13,7 @@ public class Projectile : MonoBehaviour
     private int damage;
     private int minDamage;
     private float radius;
+    private float knockback;
     private LayerMask mask;
     private bool exploded;
     private Rigidbody rb;
@@ -23,13 +24,14 @@ public class Projectile : MonoBehaviour
     }
 
     // Lo llama Weapon justo despues de instanciarlo.
-    public void Launch(Vector3 velocity, int dmg, int minDmg, float explosionRadius, LayerMask hitMask)
+    public void Launch(Vector3 velocity, int dmg, int minDmg, float explosionRadius, float knockbackForce, LayerMask hitMask)
     {
         if (rb == null) rb = GetComponent<Rigidbody>();  // por si Launch llega antes que Awake
 
         damage = dmg;
         minDamage = minDmg;
         radius = explosionRadius;
+        knockback = knockbackForce;
         mask = hitMask;
         exploded = false;
 
@@ -59,6 +61,14 @@ public class Projectile : MonoBehaviour
 
             float t = Mathf.Clamp01(Vector3.Distance(transform.position, col.transform.position) / radius);
             dmgable.TakeDamage(Mathf.Max(1, Mathf.RoundToInt(Mathf.Lerp(damage, minDamage, t))));
+
+            // Empuje radial desde el centro de la explosion (menos fuerte en el borde).
+            if (knockback > 0f)
+            {
+                var kb = col.GetComponentInParent<IKnockbackable>();
+                if (kb != null)
+                    kb.ApplyKnockback(col.transform.position - transform.position, knockback * (1f - t));
+            }
         }
 
         // De momento se destruye; el efecto visual de explosion vendra luego.

@@ -31,6 +31,9 @@ public class WeaponData : ScriptableObject
     public float falloffStart = 15f;  // hasta esta distancia, dano completo
     public float falloffEnd = 60f;    // desde esta distancia, solo minDamage
 
+    [Header("Empuje al impactar (knockback)")]
+    public float knockback = 8f;      // fuerza del empujon al enemigo (0 = nada)
+
     [Header("Escopeta (si fireType = Shotgun)")]
     public int pellets = 8;           // nº de perdigones por disparo
     public float spreadAngle = 6f;    // dispersion del cono, en grados

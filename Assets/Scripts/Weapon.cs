@@ -120,6 +120,13 @@ public class Weapon : MonoBehaviour
             if (damageable != null)
                 damageable.TakeDamage(DamageForDistance(hit.distance));
 
+            // Empuje (knockback) si lo golpeado puede recibirlo.
+            if (data.knockback > 0f)
+            {
+                var kb = hit.collider.GetComponent<IKnockbackable>();
+                if (kb != null) kb.ApplyKnockback(direction, data.knockback);
+            }
+
             Debug.DrawLine(origin, hit.point, Color.red, 1f);
             // El bool indica si golpeamos algo danable (WeaponAudio elige carne vs pared).
             Hit?.Invoke(hit, damageable != null);
@@ -153,7 +160,7 @@ public class Weapon : MonoBehaviour
         Vector3 spawn = origin + direction * 1.2f;
         GameObject p = Instantiate(data.projectilePrefab, spawn, Quaternion.LookRotation(direction));
         if (p.TryGetComponent(out Projectile proj))
-            proj.Launch(direction * data.projectileSpeed, data.damage, data.minDamage, data.explosionRadius, hitMask);
+            proj.Launch(direction * data.projectileSpeed, data.damage, data.minDamage, data.explosionRadius, data.knockback, hitMask);
     }
 
     // Dano segun la distancia al impacto: completo hasta falloffStart, baja

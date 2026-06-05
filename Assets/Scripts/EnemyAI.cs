@@ -4,7 +4,7 @@ using UnityEngine.AI; // NavMeshAgent vive aqui
 // IA basica: el enemigo persigue al jugador usando el NavMesh.
 // Va en el GameObject "Enemy" (necesita un NavMeshAgent).
 [RequireComponent(typeof(NavMeshAgent))]
-public class EnemyAI : MonoBehaviour
+public class EnemyAI : MonoBehaviour, IKnockbackable
 {
     [Header("Objetivo")]
     public Transform target; // arrastra aqui el "Player"
@@ -19,10 +19,15 @@ public class EnemyAI : MonoBehaviour
     // cada repathInterval segundos, escalonado entre enemigos para no sincronizar.
     public float repathInterval = 0.2f;
 
+    [Header("Knockback")]
+    public float knockbackDuration = 0.15f;  // duracion del empujon + mini-aturdimiento
+
     private NavMeshAgent agent;
     private IDamageable targetDamageable;  // a quien golpeamos (el jugador, vía interfaz)
     private float lastAttackTime;          // cuando golpeo por ultima vez
     private float repathTimer;             // cuenta atras para el proximo SetDestination
+    private float knockbackTimer;          // tiempo restante de empujon (0 = normal)
+    private Vector3 knockbackVel;          // velocidad de empuje actual (decae)
 
     void Awake()
     {
@@ -45,11 +50,35 @@ public class EnemyAI : MonoBehaviour
 
         // Escalonamos el primer repath para repartir la carga entre enemigos.
         repathTimer = Random.value * repathInterval;
+        knockbackTimer = 0f;   // por si se reutiliza desde el pool
+    }
+
+    // IKnockbackable: el arma/explosion nos empuja al impactar.
+    public void ApplyKnockback(Vector3 direction, float force)
+    {
+        if (agent == null || !agent.isOnNavMesh) return;
+        direction.y = 0f;                       // empuje horizontal, no hacia arriba
+        if (direction.sqrMagnitude < 0.0001f) return;
+
+        knockbackVel = direction.normalized * force;
+        knockbackTimer = knockbackDuration;
+        agent.isStopped = true;                 // deja de perseguir mientras dura
     }
 
     void Update()
     {
         if (target == null) return;
+
+        // Mientras dura el knockback: empuje + mini-aturdimiento (ni persigue ni ataca).
+        if (knockbackTimer > 0f)
+        {
+            knockbackTimer -= Time.deltaTime;
+            agent.Move(knockbackVel * Time.deltaTime);                 // respeta el NavMesh
+            knockbackVel = Vector3.Lerp(knockbackVel, Vector3.zero, Time.deltaTime / knockbackDuration);
+            if (knockbackTimer <= 0f && agent.isOnNavMesh)
+                agent.isStopped = false;                              // reanuda la persecucion
+            return;
+        }
 
         // Repath con throttle: solo recalculamos la ruta cada repathInterval seg
         // (no cada frame). El NavMeshAgent sigue moviendose suave entre recalculos.
