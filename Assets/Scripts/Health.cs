@@ -38,6 +38,13 @@ public abstract class Health : MonoBehaviour, IDamageable
         isDead = false;
     }
 
+    // Como ResetState pero escalando la vida (para el escalado de dificultad por oleada).
+    protected void ScaleAndResetHealth(float multiplier)
+    {
+        currentHealth = Mathf.Max(1, Mathf.RoundToInt(maxHealth * multiplier));
+        isDead = false;
+    }
+
     public void TakeDamage(int amount)
     {
         if (isDead) return; // ya muerto: ignora golpes extra

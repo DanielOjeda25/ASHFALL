@@ -30,6 +30,11 @@ public class WaveSystem : MonoBehaviour
     public float minTimeBetweenWaves = 1.5f;   // suelo del descanso
     public float firstWaveDelay = 2f;          // margen antes de la primera oleada
 
+    [Header("Escalado de dificultad (por oleada)")]
+    public float healthGrowthPerWave = 0.15f;  // +15% vida de enemigos por oleada
+    public float speedGrowthPerWave = 0.05f;   // +5% velocidad por oleada
+    public float maxSpeedMultiplier = 2f;      // tope de velocidad (que no sea imposible)
+
     [Header("Generador")]
     public EnemySpawner spawner;          // quien instancia los enemigos
 
@@ -58,6 +63,7 @@ public class WaveSystem : MonoBehaviour
             Debug.LogError("WaveSystem: falta asignar el EnemySpawner.");
             return;
         }
+        Difficulty.Reset();   // empezar sin escalado (clave al reiniciar la escena)
         StartCoroutine(RunWaves());
     }
 
@@ -69,6 +75,11 @@ public class WaveSystem : MonoBehaviour
         {
             currentWave++;
             WaveChanged?.Invoke(currentWave);
+
+            // Escalado de dificultad: los enemigos de esta oleada nacen mas duros y
+            // un poco mas rapidos (cada enemigo lo lee al activarse, incluso del pool).
+            Difficulty.healthMultiplier = 1f + (currentWave - 1) * healthGrowthPerWave;
+            Difficulty.speedMultiplier = Mathf.Min(maxSpeedMultiplier, 1f + (currentWave - 1) * speedGrowthPerWave);
 
             int remaining = EnemiesForWave(currentWave);   // cuota total de la oleada
             Debug.Log($"=== OLEADA {currentWave} — {remaining} enemigos (max {maxAliveAtOnce} vivos) ===");

@@ -30,11 +30,13 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
     private float repathTimer;             // cuenta atras para el proximo SetDestination
     private float knockbackTimer;          // tiempo restante de empujon (0 = normal)
     private Vector3 knockbackVel;          // velocidad de empuje actual (decae)
+    private float baseSpeed;               // velocidad original del agente (sin escalar)
 
     void Awake()
     {
         // Cacheamos el agente una vez.
         agent = GetComponent<NavMeshAgent>();
+        baseSpeed = agent.speed;           // guardamos la velocidad base del prefab
     }
 
     // OnEnable (no Start): asi tambien se reinicializa al REACTIVAR un enemigo
@@ -53,6 +55,9 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
         // Escalonamos el primer repath para repartir la carga entre enemigos.
         repathTimer = Random.value * repathInterval;
         knockbackTimer = 0f;   // por si se reutiliza desde el pool
+
+        // Velocidad escalada por la dificultad de la oleada actual.
+        if (agent != null) agent.speed = baseSpeed * Difficulty.speedMultiplier;
     }
 
     // IKnockbackable: el arma/explosion nos empuja al impactar.

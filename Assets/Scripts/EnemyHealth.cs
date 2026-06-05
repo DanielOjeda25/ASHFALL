@@ -17,7 +17,7 @@ public class EnemyHealth : Health
     // reciclado del pool. Revive (vida llena) y anuncia su nacimiento.
     void OnEnable()
     {
-        ResetState();
+        ScaleAndResetHealth(Difficulty.healthMultiplier);  // vida escalada por la dificultad
         Spawned?.Invoke(this);
     }
 
