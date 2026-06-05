@@ -85,35 +85,75 @@ public class Weapon : MonoBehaviour
 
         // Gastamos una bala y avisamos del disparo (muzzle, sonido, recoil reaccionan).
         currentAmmo--;
-        Debug.Log($"Disparo. Balas: {currentAmmo}/{magazineSize}");
         Fired?.Invoke();
         AmmoChanged?.Invoke();
 
-        // Rayo desde el centro de la camara hacia delante.
         Vector3 origin = fpsCamera.transform.position;
-        Vector3 direction = fpsCamera.transform.forward;
+        Vector3 forward = fpsCamera.transform.forward;
 
+        // La FORMA de disparar la decide el WeaponData (un arma nueva = otra ficha).
+        switch (data.fireType)
+        {
+            case FireType.Shotgun:
+                // Varios perdigones repartidos en un cono de dispersion.
+                for (int i = 0; i < data.pellets; i++)
+                    FireRay(origin, SpreadDirection(forward, data.spreadAngle));
+                break;
+
+            case FireType.Projectile:
+                // Lanza un proyectil que explota (dano en area) al impactar.
+                FireProjectile(origin, forward);
+                break;
+
+            default: // Single: un raycast recto (pistola/rifle).
+                FireRay(origin, forward);
+                break;
+        }
+    }
+
+    // Un raycast: aplica dano (con falloff) a lo golpeado y emite el evento Hit.
+    void FireRay(Vector3 origin, Vector3 direction)
+    {
         if (Physics.Raycast(origin, direction, out RaycastHit hit, data.range, hitMask))
         {
-            Debug.Log($"Impacto en: {hit.collider.name} (a {hit.distance:F1} m)");
-
-            // Si lo golpeado se puede danar (IDamageable), le aplicamos dano con
-            // caida por distancia: a quemarropa pega data.damage, lejos baja a minDamage.
             IDamageable damageable = hit.collider.GetComponent<IDamageable>();
             if (damageable != null)
                 damageable.TakeDamage(DamageForDistance(hit.distance));
 
-            Debug.DrawLine(origin, hit.point, Color.red, 1f); // depuracion en Scene
-
-            // Avisamos del impacto. El bool indica si golpeamos algo danable
-            // (lo usa WeaponAudio para elegir sonido de carne vs pared).
+            Debug.DrawLine(origin, hit.point, Color.red, 1f);
+            // El bool indica si golpeamos algo danable (WeaponAudio elige carne vs pared).
             Hit?.Invoke(hit, damageable != null);
         }
         else
         {
-            Debug.Log("Fallo (no golpeo nada)");
             Debug.DrawRay(origin, direction * data.range, Color.green, 1f);
         }
+    }
+
+    // Direccion con dispersion aleatoria dentro de un cono de 'angle' grados.
+    Vector3 SpreadDirection(Vector3 forward, float angle)
+    {
+        float yaw   = UnityEngine.Random.Range(-angle, angle);
+        float pitch = UnityEngine.Random.Range(-angle, angle);
+        return Quaternion.AngleAxis(yaw, fpsCamera.transform.up)
+             * Quaternion.AngleAxis(pitch, fpsCamera.transform.right)
+             * forward;
+    }
+
+    // Instancia un proyectil por delante de la camara y lo lanza.
+    void FireProjectile(Vector3 origin, Vector3 direction)
+    {
+        if (data.projectilePrefab == null)
+        {
+            Debug.LogWarning("Weapon: fireType=Projectile pero falta 'projectilePrefab' en el WeaponData.", this);
+            return;
+        }
+
+        // Algo por delante para no chocar con el propio jugador al nacer.
+        Vector3 spawn = origin + direction * 1.2f;
+        GameObject p = Instantiate(data.projectilePrefab, spawn, Quaternion.LookRotation(direction));
+        if (p.TryGetComponent(out Projectile proj))
+            proj.Launch(direction * data.projectileSpeed, data.damage, data.minDamage, data.explosionRadius, hitMask);
     }
 
     // Dano segun la distancia al impacto: completo hasta falloffStart, baja

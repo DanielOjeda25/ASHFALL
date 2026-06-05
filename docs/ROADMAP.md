@@ -77,22 +77,29 @@ dependen de assets externos; los sonidos necesitan clips que aporta el autor).
   extensa** para que los enemigos rodeen; posibles transiciones entre zonas (triggers/puertas).
 - **Hordas y oleadas**: ✅ *base hecha* — `WaveSystem` (híbrido finito/infinito) que escala
   enemigos por oleada. Falta: spawners por zonas del mapa grande y contador de oleada en HUD.
-- **Rendimiento para hordas** (será el tema central): ✅ *iniciado* — `EnemyAI` ya cachea al
-  Player (`PlayerHealth.Current`) y hace *throttle* de repath. Falta: **object pooling** de
-  enemigos, impactos y partículas; límites de balas/sonidos simultáneos.
+- **Rendimiento para hordas** (será el tema central): ✅ *muy avanzado* — `EnemyAI` cachea al
+  Player (`PlayerHealth.Current`) y hace *throttle* de repath; **object pooling** hecho para
+  **enemigos** (`EnemyPool`) y **efectos de impacto** (`PrefabPool` genérico: chispas y marcas).
+  Falta: límites de balas/sonidos simultáneos; pooling de proyectiles si hace falta.
 - **Variedad de enemigos tipo SS**: melee que cargan (kamikaze/headless), *ranged*, distintos
   tamaños — más allá del enemigo-cápsula único actual.
-- **Explosiones de área y props destructibles**: daño en área con `Physics.OverlapSphere` →
-  `TakeDamage` a todo `IDamageable` en el radio (lanzacohetes, barriles). Props destructibles =
-  objetos que implementan `IDamageable` y al morir se cambian por escombros/fractura. **Encaja
-  con la arquitectura actual.** Descartado: deformación real del terreno (caro + choca con NavMesh).
+- **Explosiones de área y props destructibles**: ✅ *base hecha* — `Projectile.cs` explota al
+  impactar y aplica daño en área con `Physics.OverlapSphere` → `TakeDamage` a todo `IDamageable`
+  del radio (con caída por distancia). Usado por el arma en modo `Projectile` (bazooka). Falta:
+  efecto visual de explosión, knockback, y props destructibles (objetos `IDamageable` que al
+  morir se cambian por escombros). Descartado: deformación real del terreno (caro + choca NavMesh).
 - **Personajes y animaciones realistas (Blender → Unity)**: modelar/riggear/animar en
   Blender y exportar `.fbx` (malla + armature + clips). Dos frentes: **viewmodel de brazos+arma**
   para el FPS, y sobre todo **enemigos animados** (idle/andar/atacar/morir) — los que más se notan.
   En Unity: Rig Humanoid (permite reusar animaciones de **Mixamo**) + **Animator Controller**
   (máquina de estados con parámetros). El recoil procedural por código puede convivir encima de
   las animaciones o sustituirse por una animación de disparo. Reemplazaría las cápsulas placeholder.
-- **Arsenal**: varias armas potentes (escopeta, cañón…) acordes al género.
+- **Arsenal** (escopeta, cañón, bazooka…): ✅ *base hecha* — armas **dirigidas por datos**
+  (`WeaponData` ScriptableObject: daño, falloff, cargador, etc.) y **3 formas de disparo** en
+  `Weapon` (`Single` raycast, `Shotgun` N perdigones con dispersión, `Projectile` con AoE).
+  Asset `Pistola` creado y funcionando. **Falta (Fase 3):** `WeaponManager` (inventario +
+  cambio de arma con 1/2/3 o rueda, munición por arma) y crear los assets `Escopeta`/`Bazooka`
+  + modelos/prefabs en el editor.
 
 ---
 

@@ -13,10 +13,16 @@ MonoBehaviour:
   m_Name: Pistola
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: Pistola
+  fireType: 0
   range: 100
   damage: 25
   minDamage: 8
   falloffStart: 15
   falloffEnd: 60
+  pellets: 8
+  spreadAngle: 6
+  projectilePrefab: {fileID: 8397211671970555492, guid: e5f1a21196f0cb84bba027e450d7aed0, type: 3}
+  projectileSpeed: 35
+  explosionRadius: 4
   magazineSize: 12
   reloadTime: 1.5
