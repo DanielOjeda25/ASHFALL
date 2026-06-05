@@ -75,13 +75,17 @@ dependen de assets externos; los sonidos necesitan clips que aporta el autor).
 - **Mapa-arena grande**: escenario amplio con cobertura, alturas y espacios abiertos para
   hordas. Modelado con **ProBuilder** (o malla externa) + **NavMesh horneado sobre área
   extensa** para que los enemigos rodeen; posibles transiciones entre zonas (triggers/puertas).
-- **Hordas y oleadas**: `EnemySpawner` evoluciona a **sistema de oleadas (waves)** con spawners
-  por zonas; muchos enemigos vivos a la vez. Base ya existente: `GameManager` cuenta enemigos.
-- **Rendimiento para hordas** (será el tema central): **object pooling** de enemigos, impactos
-  y partículas; **cachear** la referencia al Player en `EnemyAI` (hoy usa `FindAnyObjectByType`);
-  AI barata; límites de balas/sonidos simultáneos.
+- **Hordas y oleadas**: ✅ *base hecha* — `WaveSystem` (híbrido finito/infinito) que escala
+  enemigos por oleada. Falta: spawners por zonas del mapa grande y contador de oleada en HUD.
+- **Rendimiento para hordas** (será el tema central): ✅ *iniciado* — `EnemyAI` ya cachea al
+  Player (`PlayerHealth.Current`) y hace *throttle* de repath. Falta: **object pooling** de
+  enemigos, impactos y partículas; límites de balas/sonidos simultáneos.
 - **Variedad de enemigos tipo SS**: melee que cargan (kamikaze/headless), *ranged*, distintos
   tamaños — más allá del enemigo-cápsula único actual.
+- **Explosiones de área y props destructibles**: daño en área con `Physics.OverlapSphere` →
+  `TakeDamage` a todo `IDamageable` en el radio (lanzacohetes, barriles). Props destructibles =
+  objetos que implementan `IDamageable` y al morir se cambian por escombros/fractura. **Encaja
+  con la arquitectura actual.** Descartado: deformación real del terreno (caro + choca con NavMesh).
 - **Personajes y animaciones realistas (Blender → Unity)**: modelar/riggear/animar en
   Blender y exportar `.fbx` (malla + armature + clips). Dos frentes: **viewmodel de brazos+arma**
   para el FPS, y sobre todo **enemigos animados** (idle/andar/atacar/morir) — los que más se notan.
