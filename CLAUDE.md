@@ -40,7 +40,7 @@ Ver `docs/ROADMAP.md`. Orden de construcción (de adentro hacia afuera):
 · 6. Pulido (sonido, partículas, animación).
 
 ## Estado actual
-**Fases 0–5 cerradas.** Decidido: el shooter es **FPS** (cámara en los ojos).
+**Fases 0–6 cerradas (v1 completo).** Decidido: el shooter es **FPS** (cámara en los ojos).
 Escena `Assets/Scenes/SampleScene.unity`: suelo (Plane 50×50 con `Materials/Ground.mat`),
 Directional Light, Global Volume (URP) y **Player** (cápsula + CharacterController) con la
 Main Camera como hija a la altura de los ojos.
@@ -61,5 +61,16 @@ pausa con Esc y reinicio (`SceneManager.LoadScene`). `MouseLook` y `Weapon` igno
 `Time.timeScale == 0` (no mover cámara ni disparar en pausa/game over).
 Scripts en `Assets/Scripts/`: `PlayerMovement`, `MouseLook`, `Weapon`, `EnemyHealth`, `EnemyAI`,
 `EnemySpawner`, `PlayerHealth`, `HUD`, `GameManager` — todo con el **Input System nuevo**.
-Siguiente: **Fase 6 — Pulido** (sonido, partículas, animación). El mapa (ProBuilder + niveles)
-se movió al **backlog v2.0** (ver ROADMAP) por decisión del autor.
+**Fase 6 (en progreso):** partículas hechas — **muzzle flash** (`MuzzleFlash`, hijo del arma,
+Play On Awake off, disparado por `Weapon.muzzleFlash.Play()`) y **chispas de impacto** (prefab
+`Assets/Prefabs/ImpactSparks` instanciado en `hit.point` con Stretched Billboard + Trails;
+campo `Weapon.impactSparks`). **Sonidos** hechos — `AudioSource` en `Weapon` (`[RequireComponent]`),
+clips en `Assets/Audio/`: disparo (`fire1`), `empty`, `reload` por `PlayOneShot`; impacto 2D al azar
+según superficie (`concrete1..4` pared / `flesh1..5` enemigo, vía `EnemyHealth` en lo golpeado).
+Disparo semiautomático (1 tiro por clic). **Recoil** hecho — efecto procedural en `Weapon.cs`:
+al disparar el arma retrocede (`recoilKickback` en Z) y vuelve suave en `LateUpdate` con offsets
+que decaen (`Lerp`); `recoilPitch` a 0 (solo retroceso, sin cabeceo, por decisión del autor).
+**Fases 0–6 cerradas** ✅ — el v1 (juego jugable + pulido) está completo.
+**Norte del proyecto:** arena horde shooter estilo **Serious Sam** (mapas enormes + hordas);
+el escenario grande, oleadas, pooling y enemigos animados (Blender) están en la **Visión v2.0**
+del ROADMAP. Cada decisión se evalúa por: ¿escala a mapa grande + hordas?

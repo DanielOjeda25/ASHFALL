@@ -49,21 +49,46 @@ Leyenda: ✅ hecho · 🟡 en progreso · ⬜ pendiente
   recarga la escena (`SceneManager.LoadScene`). `MouseLook` y `Weapon` ignoran input con
   `Time.timeScale == 0` (no mover cámara ni disparar en pausa/game over)
 
-## Fase 6 — Pulido ⬜
+## Fase 6 — Pulido ✅
 Orden acordado: **1) partículas → 2) sonidos → 3) animaciones** (las partículas no
 dependen de assets externos; los sonidos necesitan clips que aporta el autor).
-- [ ] Partículas (muzzle flash al disparar + chispas en el impacto, reusando `hit.point`)
-- [ ] Sonidos (disparo, impacto, recarga) — requiere clips de audio (`.wav`)
-- [ ] Animaciones básicas (retroceso/recoil del arma al disparar)
+- [x] Partículas — **muzzle flash** (`MuzzleFlash`, hijo del arma; `Weapon.muzzleFlash.Play()`)
+  + **chispas en el impacto** (prefab `Assets/Prefabs/ImpactSparks`, instanciado en `hit.point`;
+  Stretched Billboard + Trails para look de chispa). Campos `muzzleFlash`/`impactSparks` en `Weapon.cs`.
+- [x] Sonidos — `AudioSource` en `Weapon` (2D). Disparo (`fire1`), sin munición (`empty`),
+  recarga (`reload`) vía `PlayOneShot`; impacto en pared (`concrete1..4`) vs enemigo (`flesh1..5`)
+  elegido al azar. Clips en `Assets/Audio/`. Disparo semiautomático (1 tiro por clic, sin cadencia tope).
+- [x] Recoil del arma — efecto procedural por código en `Weapon.cs`: al disparar la pose
+  retrocede (`recoilKickback`, eje Z local) y vuelve suave en `LateUpdate` (offsets que decaen
+  con `Lerp`). `recoilPitch` (cabeceo) disponible pero a 0 por decisión del autor (solo retroceso).
 
 ---
 
-## Backlog v2.0 (mejoras futuras, fuera del alcance v1)
-> No estaban en el plan original; se dejan para una posible v2.0.
-- **El escenario**: mapa bueno con niveles/subniveles, modelado con **ProBuilder**
-  (paredes, rampas, cobertura, salas) + re-hornear NavMesh para que los enemigos rodeen;
-  transiciones entre zonas (puertas/triggers). Lo modelaría el autor; el agente guía.
-- Patrulla de enemigos cuando no persiguen · oleadas de spawns · object pooling de impactos.
+## Visión v2.0 — Arena horde shooter (estilo Serious Sam) 🎯
+> **El Norte del proyecto.** Referencia explícita del autor: **Serious Sam** (First/Second
+> Encounter). Objetivo: **mapas enormes** + **hordas masivas** de enemigos que rodean al
+> jugador; combate de moverse sin parar (*backpedaling*) disparando a docenas a la vez.
+> A partir de aquí, **toda decisión de diseño/arquitectura se evalúa por**: ¿escala a mapa
+> grande + hordas? Se documenta como v2.0 pero marca el rumbo de cada paso de v1.
+
+**Pilares para llegar ahí (fuera del alcance del v1 actual):**
+- **Mapa-arena grande**: escenario amplio con cobertura, alturas y espacios abiertos para
+  hordas. Modelado con **ProBuilder** (o malla externa) + **NavMesh horneado sobre área
+  extensa** para que los enemigos rodeen; posibles transiciones entre zonas (triggers/puertas).
+- **Hordas y oleadas**: `EnemySpawner` evoluciona a **sistema de oleadas (waves)** con spawners
+  por zonas; muchos enemigos vivos a la vez. Base ya existente: `GameManager` cuenta enemigos.
+- **Rendimiento para hordas** (será el tema central): **object pooling** de enemigos, impactos
+  y partículas; **cachear** la referencia al Player en `EnemyAI` (hoy usa `FindAnyObjectByType`);
+  AI barata; límites de balas/sonidos simultáneos.
+- **Variedad de enemigos tipo SS**: melee que cargan (kamikaze/headless), *ranged*, distintos
+  tamaños — más allá del enemigo-cápsula único actual.
+- **Personajes y animaciones realistas (Blender → Unity)**: modelar/riggear/animar en
+  Blender y exportar `.fbx` (malla + armature + clips). Dos frentes: **viewmodel de brazos+arma**
+  para el FPS, y sobre todo **enemigos animados** (idle/andar/atacar/morir) — los que más se notan.
+  En Unity: Rig Humanoid (permite reusar animaciones de **Mixamo**) + **Animator Controller**
+  (máquina de estados con parámetros). El recoil procedural por código puede convivir encima de
+  las animaciones o sustituirse por una animación de disparo. Reemplazaría las cápsulas placeholder.
+- **Arsenal**: varias armas potentes (escopeta, cañón…) acordes al género.
 
 ---
 
