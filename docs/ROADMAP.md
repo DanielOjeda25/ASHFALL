@@ -75,8 +75,9 @@ dependen de assets externos; los sonidos necesitan clips que aporta el autor).
 - **Mapa-arena grande**: escenario amplio con cobertura, alturas y espacios abiertos para
   hordas. Modelado con **ProBuilder** (o malla externa) + **NavMesh horneado sobre área
   extensa** para que los enemigos rodeen; posibles transiciones entre zonas (triggers/puertas).
-- **Hordas y oleadas**: ✅ *base hecha* — `WaveSystem` (híbrido finito/infinito) que escala
-  enemigos por oleada. Falta: spawners por zonas del mapa grande y contador de oleada en HUD.
+- **Hordas y oleadas**: ✅ *hecho* — `WaveSystem` híbrido (finito/infinito) con **pacing**
+  (tope de vivos + spawn por tandas), **escalado de dificultad** (vida/velocidad por oleada) y
+  **contador de oleada en HUD**. Falta: spawners por **zonas** del mapa grande.
 - **Rendimiento para hordas** (será el tema central): ✅ *muy avanzado* — `EnemyAI` cachea al
   Player (`PlayerHealth.Current`) y hace *throttle* de repath; **object pooling** hecho para
   **enemigos** (`EnemyPool`) y **efectos de impacto** (`PrefabPool` genérico: chispas y marcas).
@@ -85,27 +86,37 @@ dependen de assets externos; los sonidos necesitan clips que aporta el autor).
   tamaños — más allá del enemigo-cápsula único actual.
 - **Explosiones de área y props destructibles**: ✅ *base hecha* — `Projectile.cs` explota al
   impactar y aplica daño en área con `Physics.OverlapSphere` → `TakeDamage` a todo `IDamageable`
-  del radio (con caída por distancia). Usado por el arma en modo `Projectile` (bazooka). Falta:
-  efecto visual de explosión, knockback, y props destructibles (objetos `IDamageable` que al
-  morir se cambian por escombros). Descartado: deformación real del terreno (caro + choca NavMesh).
+  del radio (con caída por distancia) + **knockback radial**. Usado por el arma en modo
+  `Projectile` (bazooka). Falta: **efecto visual** de explosión (VFX) + **clip real** de sonido
+  (ahora placeholder), y props destructibles (objetos `IDamageable` que al morir se cambian por
+  escombros). Descartado: deformación real del terreno (caro + choca NavMesh).
 - **Personajes y animaciones realistas (Blender → Unity)**: modelar/riggear/animar en
   Blender y exportar `.fbx` (malla + armature + clips). Dos frentes: **viewmodel de brazos+arma**
   para el FPS, y sobre todo **enemigos animados** (idle/andar/atacar/morir) — los que más se notan.
   En Unity: Rig Humanoid (permite reusar animaciones de **Mixamo**) + **Animator Controller**
   (máquina de estados con parámetros). El recoil procedural por código puede convivir encima de
   las animaciones o sustituirse por una animación de disparo. Reemplazaría las cápsulas placeholder.
-- **Arsenal** (escopeta, cañón, bazooka…): ✅ *base hecha* — armas **dirigidas por datos**
-  (`WeaponData` ScriptableObject: daño, falloff, cargador, etc.) y **3 formas de disparo** en
-  `Weapon` (`Single` raycast, `Shotgun` N perdigones con dispersión, `Projectile` con AoE).
-  Asset `Pistola` creado y funcionando. **Falta (Fase 3):** `WeaponManager` (inventario +
-  cambio de arma con 1/2/3 o rueda, munición por arma) y crear los assets `Escopeta`/`Bazooka`
-  + modelos/prefabs en el editor.
+- **Arsenal**: ✅ *hecho (base)* — armas **dirigidas por datos** (`WeaponData`: daño, falloff,
+  cargador, audio por arma, `ejectsShell`, etc.) con **3 formas de disparo** (`Single` raycast,
+  `Shotgun` N perdigones, `Projectile` con AoE). **`WeaponManager`** (inventario + cambio con
+  1/2/3 o rueda, munición por arma + sonido de cambio) y assets **Pistola / Escopeta / Bazooka**
+  funcionando. Falta: más armas, y **modelos/prefabs reales** (siguen placeholders).
+- **Movimiento y feel**: ✅ *hecho* — sprint, salto y crouch sobre `CharacterController`;
+  `MovementFeel` (cámara que se hunde al agacharse/esprintar, arma que se repliega).
+- **Audio**: ✅ *hecho* — sonido **por arma** (en `WeaponData`), pasos/sprint (`PlayerFootsteps`),
+  casquillos, cambio de arma, whoosh+explosión de bazooka. Audio organizado en carpetas.
 
 ---
 
 ### Hito actual
-**Fases 0–5 cerradas** ✅. Juego jugable de principio a fin: mundo + jugador FPS + arma
-(raycast/impacto/munición) + enemigos que se generan (`EnemySpawner`), te persiguen por
-NavMesh y te atacan; HUD de vida/munición, mira, y **victoria/derrota** con game over real
-(`GameManager` congela el juego y muestra panel GANASTE/PERDISTE).
-Siguiente: **Fase 6 — Pulido** (sonido, partículas, animación). El mapa pasa al backlog v2.0.
+**v1 cerrado (Fases 0–6)** ✅ + **v2.0 en marcha**. Sobre el v1 (mundo, jugador FPS, arma,
+enemigos por NavMesh, reglas/HUD/game over) ya hay buena parte de la Visión v2.0:
+- **Movimiento**: sprint/salto/crouch + feel de cámara/arma.
+- **Oleadas**: `WaveSystem` híbrido con pacing, escalado de dificultad y contador en HUD.
+- **Rendimiento**: pooling de enemigos e impactos; `EnemyAI` cacheado + throttle.
+- **Arsenal**: `WeaponManager` + Pistola/Escopeta/Bazooka data-driven; knockback; explosión AoE.
+- **Audio**: por arma, pasos, casquillos, cambio de arma, bazooka.
+
+**Siguiente (orden sugerido):** 2º **tipo de enemigo** (melee que carga/kamikaze) → **spawners
+por zonas** → **mapa-arena grande**. Pendientes menores: VFX+clip real de explosión, props
+destructibles, enemigos animados (Blender), más armas. **El mapa grande es el gran salto restante.**
