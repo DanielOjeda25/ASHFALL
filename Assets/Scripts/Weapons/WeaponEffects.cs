@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 
+namespace ShooterDem
+{
 // Efectos visuales del arma: fogonazo al disparar y chispas + marca en el impacto.
 // Escucha los eventos de Weapon. Va en el mismo GameObject que Weapon.
 //
@@ -84,4 +86,5 @@ public class WeaponEffects : MonoBehaviour
         yield return new WaitForSeconds(seconds);
         pool.Return(go);
     }
+}
 }

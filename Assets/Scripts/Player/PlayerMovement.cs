@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem; // Nuevo Input System de Unity 6
 
+namespace ShooterDem
+{
 // Movimiento en primera persona usando el CharacterController NATIVO de Unity
 // (maneja colision, pendientes y step-offset por nosotros). Anade andar, esprintar
 // (Shift), agacharse (Ctrl) y saltar (Espacio). Expone su estado para el "feel"
@@ -113,4 +115,5 @@ public class PlayerMovement : MonoBehaviour
         float checkDist = (standHeight - crouchHeight) + 0.1f;
         return !Physics.Raycast(top, Vector3.up, checkDist);
     }
+}
 }

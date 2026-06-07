@@ -1,6 +1,8 @@
 // Dificultad global actual de la partida. La fija el WaveSystem en cada oleada y la
 // leen los enemigos al nacer/reactivarse (compatible con el pooling). Estatico para
 // que cualquier enemigo lo consulte sin referencias cruzadas.
+namespace ShooterDem
+{
 public static class Difficulty
 {
     public static float healthMultiplier = 1f;  // x vida de los enemigos
@@ -13,4 +15,5 @@ public static class Difficulty
         healthMultiplier = 1f;
         speedMultiplier = 1f;
     }
+}
 }

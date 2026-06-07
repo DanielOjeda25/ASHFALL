@@ -23,6 +23,7 @@ MonoBehaviour:
   knockback: 12
   pellets: 8
   spreadAngle: 7
+  allowDoubleFire: 1
   projectilePrefab: {fileID: 0}
   projectileSpeed: 35
   explosionRadius: 4

@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI; // NavMeshAgent.Warp
 
+namespace ShooterDem
+{
 // Pool de enemigos: recicla GameObjects en vez de Instantiate/Destroy por oleada.
 // En hordas, crear y destruir cientos de objetos dispara el recolector de basura
 // (GC -> tirones de frame) y repite inicializaciones. Aqui los enemigos muertos se
@@ -62,4 +64,5 @@ public class EnemyPool
         enemy.gameObject.SetActive(false);
         idle.Enqueue(enemy);
     }
+}
 }

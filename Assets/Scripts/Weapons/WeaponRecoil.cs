@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace ShooterDem
+{
 // Recoil procedural del arma. Escucha Weapon.Fired y aplica un "kick" que decae
 // suave en LateUpdate. Va en el MISMO GameObject que Weapon (mueve su transform).
 [RequireComponent(typeof(Weapon))]
@@ -49,4 +51,5 @@ public class WeaponRecoil : MonoBehaviour
         posOffset.z -= kickback;
         pitchOffset -= pitch;
     }
+}
 }

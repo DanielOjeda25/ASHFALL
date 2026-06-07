@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+namespace ShooterDem
+{
 // Pool GENERICO de GameObjects a partir de un prefab. Igual idea que EnemyPool pero
 // sin logica de enemigo: sirve para efectos (chispas, marcas) o cualquier cosa que
 // se cree y destruya mucho. Reutiliza objetos inactivos en vez de Instantiate/Destroy.
@@ -47,4 +49,5 @@ public class PrefabPool
         go.SetActive(false);
         idle.Enqueue(go);
     }
+}
 }

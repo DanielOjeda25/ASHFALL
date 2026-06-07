@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.AI; // NavMeshAgent vive aqui
 
+namespace ShooterDem
+{
 // IA basica: el enemigo persigue al jugador usando el NavMesh.
 // Va en el GameObject "Enemy" (necesita un NavMeshAgent).
 [RequireComponent(typeof(NavMeshAgent))]
@@ -10,9 +12,8 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
     public Transform target; // arrastra aqui el "Player"
 
     [Header("Ataque")]
-    public float attackRange = 2f;     // a que distancia puede golpear
-    public int attackDamage = 10;      // dano por golpe
-    public float attackCooldown = 1f;  // segundos entre golpes
+    public float attackRange = 2f;     // a que distancia puede atacar
+    public float attackCooldown = 1f;  // segundos entre ataques (el EFECTO lo hace EnemyAttack)
 
     [Header("Rendimiento")]
     // Recalcular la ruta cada frame por enemigo no escala a hordas. Lo hacemos
@@ -25,8 +26,8 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
     public float knockbackDuration = 0.08f;  // duracion del empujon + mini-aturdimiento
 
     private NavMeshAgent agent;
-    private IDamageable targetDamageable;  // a quien golpeamos (el jugador, vía interfaz)
-    private float lastAttackTime;          // cuando golpeo por ultima vez
+    private EnemyAttack attack;            // estrategia de ataque (melee, a distancia, kamikaze...)
+    private float lastAttackTime;          // cuando ataco por ultima vez
     private float repathTimer;             // cuenta atras para el proximo SetDestination
     private float knockbackTimer;          // tiempo restante de empujon (0 = normal)
     private Vector3 knockbackVel;          // velocidad de empuje actual (decae)
@@ -34,9 +35,10 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
 
     void Awake()
     {
-        // Cacheamos el agente una vez.
+        // Cacheamos componentes una vez.
         agent = GetComponent<NavMeshAgent>();
-        baseSpeed = agent.speed;           // guardamos la velocidad base del prefab
+        attack = GetComponent<EnemyAttack>();   // la estrategia de ataque del prefab
+        baseSpeed = agent.speed;                // guardamos la velocidad base del prefab
     }
 
     // OnEnable (no Start): asi tambien se reinicializa al REACTIVAR un enemigo
@@ -47,10 +49,6 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
         // sin escanear la escena).
         if (target == null && PlayerHealth.Current != null)
             target = PlayerHealth.Current.transform;
-
-        // Guardamos su "danable" para poder restarle vida al atacar.
-        if (target != null)
-            targetDamageable = target.GetComponent<IDamageable>();
 
         // Escalonamos el primer repath para repartir la carga entre enemigos.
         repathTimer = Random.value * repathInterval;
@@ -97,13 +95,14 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
             agent.SetDestination(target.position);
         }
 
-        // El chequeo de ataque es barato: lo dejamos cada frame.
-        // Si estamos lo bastante cerca, atacamos (con un cooldown entre golpes).
-        float distance = Vector3.Distance(transform.position, target.position);
-        if (distance <= attackRange && Time.time >= lastAttackTime + attackCooldown)
+        // En rango + sin cooldown -> delegamos el efecto a la estrategia de ataque.
+        // sqrMagnitude (sin sqrt) para no pagar una raiz por enemigo cada frame.
+        Vector3 toTarget = target.position - transform.position;
+        if (toTarget.sqrMagnitude <= attackRange * attackRange && Time.time >= lastAttackTime + attackCooldown)
         {
             lastAttackTime = Time.time;
-            targetDamageable?.TakeDamage(attackDamage);
+            attack?.Execute(target);
         }
     }
+}
 }

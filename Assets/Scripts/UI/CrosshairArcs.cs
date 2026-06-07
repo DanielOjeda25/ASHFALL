@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
+namespace ShooterDem
+{
 // Reticle con indicadores en ARCO + mira central, dibujado con Painter2D (sin sprites).
 // - 4 arcos: vida + escudo (izq), cargador + reserva (der). Color duotono; rojo si bajo.
 // - Mira CENTRAL distinta por arma (cruz / circulo / punto) -> estilo Half-Life.
@@ -21,6 +23,10 @@ public class CrosshairArcs : VisualElement
 
     private CrosshairStyle reticle = CrosshairStyle.Cross;
     public CrosshairStyle Reticle { set { reticle = value; MarkDirtyRepaint(); } }
+
+    // Radio del circulo (estilo escopeta): refleja la dispersion del arma.
+    private float circleRadius = 9f;
+    public float CircleRadius { set { circleRadius = Mathf.Max(2f, value); MarkDirtyRepaint(); } }
 
     // Lo llama el HUD en cada disparo: los arcos se "abren" y vuelven solos.
     public void Kick() { kick = 1f; MarkDirtyRepaint(); }
@@ -136,7 +142,7 @@ public class CrosshairArcs : VisualElement
             case CrosshairStyle.Circle:
                 p.lineWidth = 2f;
                 p.BeginPath();
-                p.Arc(c, 9f, Deg(0), Deg(360));
+                p.Arc(c, circleRadius, Deg(0), Deg(360));
                 p.Stroke();
                 break;
 
@@ -184,4 +190,5 @@ public class CrosshairArcs : VisualElement
     }
 
     static Angle Deg(float d) => new Angle(d, AngleUnit.Degree);
+}
 }

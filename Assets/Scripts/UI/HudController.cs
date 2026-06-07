@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
+namespace ShooterDem
+{
 // Controlador del HUD en UI Toolkit. Consulta los elementos del UXML por nombre y
 // los actualiza reaccionando a los EVENTOS del juego (mismo patron observador que
 // el resto del proyecto): vida, municion, oleada y arma actual. Va en el GameObject
@@ -14,16 +16,8 @@ public class HudController : MonoBehaviour
     public WaveSystem waveSystem;
     public WeaponManager weaponManager;
 
-    [Header("Umbral de vida baja")]
-    public float lowHealthThreshold = 0.3f;
-
     private Label healthValue, ammoValue, weaponName, waveValue;
-    private VisualElement healthFill;
     private CrosshairArcs crosshair;   // arcos del reticle (vida/escudo/cargador/reserva)
-
-    // Menta del duotono (215,232,208) para la barra normal; rojo para vida baja (aviso).
-    private static readonly Color BarNormal = new Color(0.843f, 0.910f, 0.816f);
-    private static readonly Color LowRed = new Color(0.9f, 0.2f, 0.15f);
 
     void OnEnable()
     {
@@ -54,7 +48,6 @@ public class HudController : MonoBehaviour
         // que aqui rootVisualElement ya esta listo para consultar.
         var root = GetComponent<UIDocument>().rootVisualElement;
         healthValue = root.Q<Label>("health-value");
-        healthFill = root.Q<VisualElement>("health-fill");
         ammoValue = root.Q<Label>("ammo-value");
         weaponName = root.Q<Label>("weapon-name");
         waveValue = root.Q<Label>("wave-value");
@@ -81,11 +74,6 @@ public class HudController : MonoBehaviour
         float pct = max > 0 ? Mathf.Clamp01((float)cur / max) : 0f;
 
         if (healthValue != null) healthValue.text = cur.ToString();
-        if (healthFill != null)
-        {
-            healthFill.style.width = Length.Percent(pct * 100f);
-            healthFill.style.backgroundColor = pct <= lowHealthThreshold ? LowRed : BarNormal;
-        }
         if (crosshair != null) crosshair.Health = pct;   // arco de vida del reticle
     }
 
@@ -124,6 +112,11 @@ public class HudController : MonoBehaviour
     {
         if (data == null) return;
         if (weaponName != null) weaponName.text = data.weaponName.ToUpper();
-        if (crosshair != null) crosshair.Reticle = data.crosshairStyle;   // mira por arma
+        if (crosshair != null)
+        {
+            crosshair.Reticle = data.crosshairStyle;          // mira por arma
+            crosshair.CircleRadius = data.spreadAngle * 3f;   // el circulo refleja la dispersion
+        }
     }
+}
 }

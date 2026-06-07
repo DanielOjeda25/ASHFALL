@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace ShooterDem
+{
 // Como dispara un arma. Lo lee Weapon para elegir la logica de disparo.
 public enum FireType
 {
@@ -48,6 +50,7 @@ public class WeaponData : ScriptableObject
     [Header("Escopeta (si fireType = Shotgun)")]
     public int pellets = 8;           // nº de perdigones por disparo
     public float spreadAngle = 6f;    // dispersion del cono, en grados
+    public bool allowDoubleFire = false; // clic derecho = doble cañon (gasta 2 cartuchos)
 
     [Header("Proyectil (si fireType = Projectile)")]
     public GameObject projectilePrefab; // debe tener Projectile + Rigidbody + Collider
@@ -65,4 +68,5 @@ public class WeaponData : ScriptableObject
     public AudioClip emptyClip;       // clic sin municion
     // ¿Suelta casquillo al disparar? Pistola/escopeta sí; bazooka/lanzas no.
     public bool ejectsShell = true;
+}
 }

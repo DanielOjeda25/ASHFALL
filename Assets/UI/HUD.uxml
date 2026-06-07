@@ -10,9 +10,6 @@
             <ui:VisualElement name="health-panel" class="panel panel-left">
                 <ui:Label text="SALUD" class="panel-label" />
                 <ui:Label name="health-value" text="100" class="big-number" />
-                <ui:VisualElement name="health-bar" class="bar">
-                    <ui:VisualElement name="health-fill" class="bar-fill" />
-                </ui:VisualElement>
             </ui:VisualElement>
 
             <ui:VisualElement name="ammo-panel" class="panel panel-right">

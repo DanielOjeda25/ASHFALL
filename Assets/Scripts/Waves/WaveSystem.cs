@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using UnityEngine;
 
+namespace ShooterDem
+{
 // Cerebro de las hordas. Genera oleadas crecientes via EnemySpawner y avanza a la
 // siguiente cuando se limpia la actual. Cuenta enemigos vivos con los eventos
 // EnemyHealth.Spawned/Killed (mismo patron observador del resto del proyecto).
@@ -145,4 +147,5 @@ public class WaveSystem : MonoBehaviour
 
     void OnEnemySpawned(EnemyHealth enemy) => enemiesAlive++;
     void OnEnemyKilled(EnemyHealth enemy) => enemiesAlive--;
+}
 }

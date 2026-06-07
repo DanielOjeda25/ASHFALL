@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;  // para recargar la escena (reiniciar)
 using UnityEngine.InputSystem;      // tecla Escape (Input System nuevo)
-using TMPro; // TextMeshPro
 
+namespace ShooterDem
+{
 // El "arbitro" del juego: gestiona derrota, pausa y la UI de fin. La VICTORIA y el
 // recuento de enemigos los lleva el WaveSystem (que llama a TriggerVictory()).
 // Va en un GameObject vacio "GameManager".
@@ -12,12 +13,9 @@ public class GameManager : MonoBehaviour
     // la victoria sin arrastrarlo en el Inspector.
     public static GameManager Instance { get; private set; }
 
-    [Header("Game Over (UI)")]
-    public GameObject gameOverPanel;  // panel que se enciende al terminar (empieza apagado)
-    public TMP_Text gameOverText;     // texto grande del mensaje
-
-    // Evento de pausa: lo escucha el menu de pausa (UITK) para mostrarse/ocultarse.
-    public static event System.Action<bool> PauseChanged;
+    // Eventos para la UI (UITK), que se suscribe para mostrarse/ocultarse.
+    public static event System.Action<bool> PauseChanged;       // pausa on/off
+    public static event System.Action<string> GameOverShown;    // fin de partida (mensaje)
 
     private bool gameOver;
     private bool isPaused;
@@ -83,11 +81,7 @@ public class GameManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;   // soltamos el cursor
         Cursor.visible = true;
 
-        if (gameOverText != null)
-            gameOverText.text = message;
-
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(true);        // encendemos el panel
+        GameOverShown?.Invoke(message);
     }
 
     // ---------- Pausa ----------
@@ -128,4 +122,5 @@ public class GameManager : MonoBehaviour
         Debug.Log("Saliendo del juego... (solo cierra en una build, no en el editor)");
         Application.Quit();
     }
+}
 }

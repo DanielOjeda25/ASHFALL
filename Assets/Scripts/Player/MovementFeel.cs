@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace ShooterDem
+{
 // Reacciones VISUALES al estado de movimiento (game feel). Lee PlayerMovement y:
 //  - baja la camara (el "ojo") al agacharse, y un pelin al esprintar (hundimiento),
 //  - repliega/baja el arma (su "holder") al esprintar y la reacomoda al parar.
@@ -62,4 +64,5 @@ public class MovementFeel : MonoBehaviour
             weaponHolder.localRotation = Quaternion.Slerp(weaponHolder.localRotation, targetRot, t);
         }
     }
+}
 }

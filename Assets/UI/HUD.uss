@@ -43,9 +43,10 @@
     border-left-color: rgb(215, 232, 208);
     padding-left: 18px;
     padding-right: 18px;
-    padding-top: 10px;
-    padding-bottom: 12px;
+    padding-top: 8px;
+    padding-bottom: 10px;
     width: 220px;            /* ancho fijo: la caja no salta al cambiar el numero */
+    align-items: center;     /* contenido centrado */
 }
 
 .panel-right {
@@ -63,21 +64,8 @@
 
 .big-number {
     color: rgb(215, 232, 208);
-    font-size: 56px;
+    font-size: 52px;
     -unity-font-style: bold;
+    -unity-text-align: middle-center;
     white-space: nowrap;
-}
-
-/* --- Barra de vida --- */
-.bar {
-    height: 6px;
-    background-color: rgba(215, 232, 208, 0.15);
-    margin-top: 6px;
-    width: 150px;
-}
-
-.bar-fill {
-    height: 6px;
-    width: 100%;
-    background-color: rgb(215, 232, 208);
 }

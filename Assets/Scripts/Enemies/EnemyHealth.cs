@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 
+namespace ShooterDem
+{
 // Vida del enemigo. Hereda toda la mecanica de Health y solo aporta lo propio:
 // anunciar nacimiento/muerte por eventos ESTATICOS (un "bus" que escuchan el
 // WaveSystem y, a futuro, otros sistemas) y volver al pool al morir.
@@ -31,4 +33,5 @@ public class EnemyHealth : Health
         if (pool != null) pool.Return(this);
         else Destroy(gameObject);
     }
+}
 }

@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 
+namespace ShooterDem
+{
 // Sonidos del arma. Escucha los eventos de Weapon y reproduce los clips (2D).
 // Va en el mismo GameObject que Weapon. Requiere un AudioSource (el "altavoz").
 [RequireComponent(typeof(AudioSource))]
@@ -85,4 +87,5 @@ public class WeaponAudio : MonoBehaviour
         if (clip != null)
             audioSource.PlayOneShot(clip);
     }
+}
 }

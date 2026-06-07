@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem; // Nuevo Input System
 
+namespace ShooterDem
+{
 // Inventario de armas: mantiene el arsenal (lista de WeaponData) y permite cambiar
 // de arma con las teclas 1..9 o la rueda del raton. Reutiliza UN solo componente
 // Weapon intercambiando su 'data', y recuerda la MUNICION de cada arma por separado.
@@ -94,4 +96,5 @@ public class WeaponManager : MonoBehaviour
         WeaponSwitched?.Invoke(weapons[index]);
         Debug.Log($"Arma equipada: {weapons[index].weaponName} ({ammo[index]}/{weapons[index].magazineSize})");
     }
+}
 }

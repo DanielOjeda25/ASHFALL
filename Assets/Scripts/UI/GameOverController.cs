@@ -3,33 +3,34 @@ using UnityEngine.UIElements;
 
 namespace ShooterDem
 {
-// Menu de pausa en UI Toolkit. Se muestra/oculta segun el evento GameManager.PauseChanged
-// y cablea los botones a las acciones del GameManager. Va en un GameObject con UIDocument
-// (PauseMenu_UITK), con sortOrder mayor que el HUD para quedar por encima.
+// Pantalla de fin de partida en UI Toolkit. Se muestra al recibir GameManager.GameOverShown
+// (con el mensaje GANASTE/PERDISTE) y cablea Reiniciar/Salir. Va en un GameObject con
+// UIDocument (GameOver_UITK), sortOrder por encima del HUD y del menu de pausa.
 [RequireComponent(typeof(UIDocument))]
-public class PauseMenuController : MonoBehaviour
+public class GameOverController : MonoBehaviour
 {
     private VisualElement root;
+    private Label resultText;
 
     void OnEnable()
     {
-        GameManager.PauseChanged += OnPauseChanged;
+        GameManager.GameOverShown += OnGameOver;
     }
 
     void OnDisable()
     {
-        GameManager.PauseChanged -= OnPauseChanged;
+        GameManager.GameOverShown -= OnGameOver;
     }
 
     void Start()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
+        resultText = root.Q<Label>("result-text");
 
-        Bind("btn-resume", () => GameManager.Instance?.Resume());
         Bind("btn-restart", () => GameManager.Instance?.RestartGame());
         Bind("btn-quit", () => GameManager.Instance?.QuitGame());
 
-        Hide();   // oculto al empezar (solo aparece al pausar)
+        Hide();   // oculto al empezar; aparece al terminar la partida
     }
 
     void Bind(string name, System.Action action)
@@ -38,10 +39,11 @@ public class PauseMenuController : MonoBehaviour
         if (btn != null) btn.clicked += action;
     }
 
-    void OnPauseChanged(bool paused)
+    void OnGameOver(string message)
     {
         if (root == null) return;
-        if (paused) Show(); else Hide();
+        if (resultText != null) resultText.text = message;
+        Show();
     }
 
     void Show() { root.style.display = DisplayStyle.Flex; }

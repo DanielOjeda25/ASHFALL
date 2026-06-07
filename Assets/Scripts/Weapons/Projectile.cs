@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+namespace ShooterDem
+{
 // Proyectil con dano en AREA (bazooka/granada). Lo lanza Weapon (fireType=Projectile).
 // Vuela en linea recta; al chocar con algo (o al agotar su vida) EXPLOTA: aplica dano
 // a todos los IDamageable dentro de un radio, con caida segun la distancia al centro.
@@ -18,6 +20,8 @@ public class Projectile : MonoBehaviour
     private LayerMask mask;
     private bool exploded;
     private Rigidbody rb;
+    // Reutilizado entre explosiones (Clear en vez de new) -> sin basura para el GC.
+    private readonly HashSet<IDamageable> alreadyHit = new HashSet<IDamageable>();
 
     void Awake()
     {
@@ -52,9 +56,9 @@ public class Projectile : MonoBehaviour
         CancelInvoke();
 
         // Dano en area: cada IDamageable dentro del radio recibe dano con caida lineal
-        // (mas dano en el centro de la explosion, menos en el borde). Usamos un HashSet
-        // para no golpear dos veces al mismo objeto si tiene varios colliders.
-        var alreadyHit = new HashSet<IDamageable>();
+        // (mas dano en el centro, menos en el borde). El HashSet evita golpear dos veces
+        // al mismo objeto si tiene varios colliders (se reutiliza con Clear).
+        alreadyHit.Clear();
         foreach (var col in Physics.OverlapSphere(transform.position, radius, mask))
         {
             var dmgable = col.GetComponentInParent<IDamageable>();
@@ -80,4 +84,5 @@ public class Projectile : MonoBehaviour
         // De momento se destruye; el efecto visual de explosion vendra luego.
         Destroy(gameObject);
     }
+}
 }

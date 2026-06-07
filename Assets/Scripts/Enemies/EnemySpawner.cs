@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.AI; // NavMesh.SamplePosition vive aqui
 
+namespace ShooterDem
+{
 // Genera enemigos en posiciones aleatorias alrededor de este objeto. Ya NO genera
 // solo en Start: es una herramienta que el WaveSystem invoca por oleada
 // (SpawnEnemies). Va en un GameObject vacio (ej. "EnemySpawner").
@@ -108,4 +110,5 @@ public class EnemySpawner : MonoBehaviour
         Vector3 vp = cam.WorldToViewportPoint(worldPos);
         return vp.z > 0f && vp.x >= 0f && vp.x <= 1f && vp.y >= 0f && vp.y <= 1f;
     }
+}
 }

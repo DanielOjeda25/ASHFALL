@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem; // Nuevo Input System de Unity 6
 
+namespace ShooterDem
+{
 // Mirar con el raton. Va en la "Main Camera" (hija del Player).
 // Horizontal -> gira el cuerpo del Player.  Vertical -> inclina la camara.
 public class MouseLook : MonoBehaviour
@@ -39,4 +41,5 @@ public class MouseLook : MonoBehaviour
         pitch = Mathf.Clamp(pitch, -89f, 89f);
         transform.localEulerAngles = new Vector3(pitch, 0f, 0f);
     }
+}
 }

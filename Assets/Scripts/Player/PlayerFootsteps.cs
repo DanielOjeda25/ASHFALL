@@ -1,5 +1,7 @@
 using UnityEngine;
 
+namespace ShooterDem
+{
 // Sonido de pasos y de sprint. Lee el estado de PlayerMovement y reproduce un paso
 // al azar a un ritmo segun el estado (agachado lento, andar medio, sprint rapido)
 // mientras el jugador este EN SUELO y MOVIENDOSE. El clip de sprint suena una vez
@@ -62,4 +64,5 @@ public class PlayerFootsteps : MonoBehaviour
         var clip = footstepClips[Random.Range(0, footstepClips.Length)];
         if (clip != null) audioSource.PlayOneShot(clip);
     }
+}
 }

@@ -3,6 +3,8 @@ using System.Collections;          // corrutinas (IEnumerator)
 using UnityEngine;
 using UnityEngine.InputSystem;     // Nuevo Input System de Unity 6
 
+namespace ShooterDem
+{
 // Responsabilidad UNICA: leer el input de disparo/recarga, lanzar el raycast,
 // aplicar dano y gestionar la municion. Los NUMEROS del arma (dano, falloff,
 // cargador...) viven en un WeaponData (ScriptableObject), de modo que un ARSENAL
@@ -70,6 +72,9 @@ public class Weapon : MonoBehaviour
     {
         // Si el juego esta congelado (pausa o game over), no disparamos ni recargamos.
         if (Time.timeScale == 0f) return;
+        // Si el cursor no esta bloqueado (p. ej. al enfocar la ventana en el editor),
+        // ignoramos el input: asi el clic que da foco no dispara.
+        if (Cursor.lockState != CursorLockMode.Locked) return;
         // Mientras recarga, o sin datos de arma, ignoramos input.
         if (isReloading || data == null) return;
 
@@ -84,23 +89,27 @@ public class Weapon : MonoBehaviour
         var mouse = Mouse.current;
         if (mouse == null) return;
 
-        // wasPressedThisFrame = un disparo por clic (semiautomatico).
+        // Clic izquierdo = disparo normal. Clic derecho = doble (si el arma lo permite).
         if (mouse.leftButton.wasPressedThisFrame)
-            Shoot();
+            Shoot(1);
+        else if (data.allowDoubleFire && mouse.rightButton.wasPressedThisFrame)
+            Shoot(2);
     }
 
-    void Shoot()
+    // barrels = cuantos "canones" disparan a la vez (1 normal, 2 doble). Gasta 'barrels'
+    // cartuchos y, en escopeta, lanza 'barrels' x perdigones.
+    void Shoot(int barrels)
     {
-        // Sin balas: avisa y emite DryFired (el sonido lo pone WeaponAudio).
-        if (currentAmmo <= 0)
+        // Sin municion suficiente: avisa y emite DryFired (el sonido lo pone WeaponAudio).
+        if (currentAmmo < barrels)
         {
-            Debug.Log("Click! Sin municion (pulsa R para recargar)");
+            Debug.Log("Click! Sin municion suficiente (pulsa R para recargar)");
             DryFired?.Invoke();
             return;
         }
 
-        // Gastamos una bala y avisamos del disparo (muzzle, sonido, recoil reaccionan).
-        currentAmmo--;
+        // Gastamos los cartuchos y avisamos del disparo (muzzle, sonido, recoil reaccionan).
+        currentAmmo -= barrels;
         Fired?.Invoke();
         AmmoChanged?.Invoke();
 
@@ -111,8 +120,8 @@ public class Weapon : MonoBehaviour
         switch (data.fireType)
         {
             case FireType.Shotgun:
-                // Varios perdigones repartidos en un cono de dispersion.
-                for (int i = 0; i < data.pellets; i++)
+                // Perdigones x canones (doble canon = el doble de plomo).
+                for (int i = 0; i < data.pellets * barrels; i++)
                     FireRay(origin, SpreadDirection(forward, data.spreadAngle));
                 break;
 
@@ -205,4 +214,5 @@ public class Weapon : MonoBehaviour
         Debug.Log($"Recargado. Balas: {currentAmmo}/{magazineSize}");
         AmmoChanged?.Invoke();   // el HUD vuelve a mostrar el numero
     }
+}
 }
