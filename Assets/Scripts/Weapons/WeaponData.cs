@@ -8,6 +8,14 @@ public enum FireType
     Projectile   // lanza un proyectil que explota (dano en area) al impactar
 }
 
+// Forma del reticle central; cambia segun el arma equipada (estilo Half-Life).
+public enum CrosshairStyle
+{
+    Cross,   // cruz con hueco (precision: pistola/rifle)
+    Circle,  // circulo (dispersion: escopeta)
+    Dot      // punto (lanzas/bazooka)
+}
+
 // "Ficha" de un arma (datos, no comportamiento). Cada arma del arsenal sera un
 // asset distinto (Pistola, Escopeta, Bazooka...) sin escribir codigo nuevo: solo
 // se rellenan estos valores. Weapon lee de aqui en runtime.
@@ -21,6 +29,9 @@ public class WeaponData : ScriptableObject
 
     [Header("Forma de disparo")]
     public FireType fireType = FireType.Single;
+
+    [Header("Mira (reticle central)")]
+    public CrosshairStyle crosshairStyle = CrosshairStyle.Cross;
 
     [Header("Disparo")]
     public float range = 100f;        // alcance del rayo en metros

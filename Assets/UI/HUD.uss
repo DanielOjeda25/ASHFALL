@@ -1,0 +1,83 @@
+/* HUD estilo Half-Life (duotono): azul-carbon + blanco-hueso, fuente Rajdhani. */
+
+.hud-root {
+    flex-grow: 1;
+    justify-content: space-between;
+    align-items: stretch;
+    -unity-font-definition: url("/Assets/UI/Fonts/Rajdhani-SemiBold.ttf");
+}
+
+/* --- Banner de oleada (arriba-centro) --- */
+.banner {
+    align-self: center;
+    margin-top: 28px;
+    align-items: center;
+}
+
+.banner-text {
+    font-size: 34px;
+    color: rgb(215, 232, 208);
+    -unity-font-style: bold;
+}
+
+.banner-sub {
+    font-size: 16px;
+    color: rgba(215, 232, 208, 0.7);
+    -unity-font-style: bold;
+    margin-top: 2px;
+}
+
+/* --- Fila inferior con los dos paneles --- */
+.bottom-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-left: 32px;
+    padding-right: 32px;
+    padding-bottom: 28px;
+}
+
+.panel {
+    background-color: rgba(22, 22, 30, 0.85);
+    border-left-width: 3px;
+    border-left-color: rgb(215, 232, 208);
+    padding-left: 18px;
+    padding-right: 18px;
+    padding-top: 10px;
+    padding-bottom: 12px;
+    width: 220px;            /* ancho fijo: la caja no salta al cambiar el numero */
+}
+
+.panel-right {
+    border-left-width: 0;
+    border-right-width: 3px;
+    border-right-color: rgb(215, 232, 208);
+    align-items: center;
+}
+
+.panel-label {
+    color: rgba(215, 232, 208, 0.6);
+    font-size: 14px;
+    -unity-font-style: bold;
+}
+
+.big-number {
+    color: rgb(215, 232, 208);
+    font-size: 56px;
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+/* --- Barra de vida --- */
+.bar {
+    height: 6px;
+    background-color: rgba(215, 232, 208, 0.15);
+    margin-top: 6px;
+    width: 150px;
+}
+
+.bar-fill {
+    height: 6px;
+    width: 100%;
+    background-color: rgb(215, 232, 208);
+}
