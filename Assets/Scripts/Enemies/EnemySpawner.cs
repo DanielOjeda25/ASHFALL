@@ -1,37 +1,44 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI; // NavMesh.SamplePosition vive aqui
 
 namespace ShooterDem
 {
-// Genera enemigos en posiciones aleatorias alrededor de este objeto. Ya NO genera
-// solo en Start: es una herramienta que el WaveSystem invoca por oleada
-// (SpawnEnemies). Va en un GameObject vacio (ej. "EnemySpawner").
+// Genera enemigos de VARIOS tipos (EnemyData) en posiciones validas alrededor del
+// spawner, con un POOL por prefab (reciclaje). Lo invoca el WaveSystem por oleada.
+// Va en un GameObject vacio (ej. "EnemySpawner").
 public class EnemySpawner : MonoBehaviour
 {
     [Header("Que generar")]
-    public GameObject enemyPrefab;    // arrastra aqui el prefab del Enemy
+    public EnemyData[] enemyTypes;    // tipos disponibles (cada uno con su peso de spawn)
 
     [Header("Donde")]
     public float areaRadius = 20f;    // radio (en metros) alrededor del spawner
     public float spawnHeight = 1f;    // altura Y (centro de la capsula = 1)
 
     [Header("Validacion de sitio")]
-    // Distancia minima al jugador: evita que un enemigo aparezca pegado/encima.
-    public float minDistanceFromPlayer = 6f;
-    // Cuanto puede "buscar" NavMesh.SamplePosition el punto valido mas cercano.
-    public float navSampleMaxDistance = 4f;
-    // Intentos por enemigo para encontrar un punto bueno antes de rendirse.
-    public int maxSpawnAttempts = 20;
-    // Evita que el enemigo aparezca dentro de la vista del jugador (feo sin animacion
-    // de aparicion). Si no hay sitio fuera de vista, cae al primer punto valido.
-    public bool spawnOutOfView = true;
+    public float minDistanceFromPlayer = 6f; // no aparecer pegado al jugador
+    public float navSampleMaxDistance = 4f;   // cuanto busca NavMesh el punto valido
+    public int maxSpawnAttempts = 20;         // intentos por enemigo antes de rendirse
+    public bool spawnOutOfView = true;        // preferir nacer fuera de camara
 
-    private EnemyPool pool;  // recicla enemigos (creado en Awake, sin cablear en editor)
-    private Camera cam;      // camara del jugador (para el chequeo de vista)
+    private readonly Dictionary<GameObject, EnemyPool> pools = new Dictionary<GameObject, EnemyPool>();
+    private float totalWeight;
+    private Camera cam;
 
     void Awake()
     {
-        pool = new EnemyPool(enemyPrefab, transform);
+        // Un pool por prefab distinto; sumamos pesos para el sorteo ponderado.
+        if (enemyTypes != null)
+        {
+            foreach (var t in enemyTypes)
+            {
+                if (t == null || t.prefab == null) continue;
+                if (!pools.ContainsKey(t.prefab))
+                    pools[t.prefab] = new EnemyPool(t.prefab, transform);
+                totalWeight += Mathf.Max(0f, t.spawnWeight);
+            }
+        }
     }
 
     // Llamado por el WaveSystem: intenta generar n enemigos y devuelve cuantos
@@ -44,69 +51,72 @@ public class EnemySpawner : MonoBehaviour
         return spawned;
     }
 
-    // Devuelve true si consiguio crear un enemigo; false si no hubo sitio valido.
     bool SpawnOne()
     {
-        // Posicion del jugador (O(1) via el localizador) para la distancia minima.
+        var type = PickType();
+        if (type == null || type.prefab == null) return false;
+
         Vector3? playerPos = PlayerHealth.Current != null
             ? PlayerHealth.Current.transform.position
             : (Vector3?)null;
 
-        bool hasFallback = false;       // primer punto valido aunque este a la vista
+        bool hasFallback = false;
         Vector3 fallback = Vector3.zero;
 
         for (int attempt = 0; attempt < maxSpawnAttempts; attempt++)
         {
-            // Punto al azar dentro del circulo de radio areaRadius.
             Vector2 circle = Random.insideUnitCircle * areaRadius;
             Vector3 candidate = transform.position + new Vector3(circle.x, spawnHeight, circle.y);
 
-            // #2 Demasiado cerca del jugador? descarta y reintenta.
             if (playerPos.HasValue &&
                 Vector3.Distance(candidate, playerPos.Value) < minDistanceFromPlayer)
                 continue;
 
-            // #1 Ajusta el punto al NavMesh mas cercano. Si no hay NavMesh en
-            // navSampleMaxDistance, este candidato no sirve: reintenta.
             if (!NavMesh.SamplePosition(candidate, out NavMeshHit hit, navSampleMaxDistance, NavMesh.AllAreas))
                 continue;
 
-            // Punto valido sobre el NavMesh (con la altura de la capsula).
             Vector3 pos = new Vector3(hit.position.x, hit.position.y + spawnHeight, hit.position.z);
 
-            // #3 Preferimos que NO nazca dentro de la vista del jugador. Si se ve,
-            // lo guardamos como reserva y seguimos buscando uno fuera de camara.
             if (spawnOutOfView && IsInView(pos))
             {
                 if (!hasFallback) { fallback = pos; hasFallback = true; }
                 continue;
             }
 
-            pool.Get(pos, Quaternion.identity);   // reutiliza si hay; si no, crea uno
+            pools[type.prefab].Get(pos, Quaternion.identity);
             return true;
         }
 
-        // No hubo sitio fuera de vista: mejor uno a la vista que ninguno.
         if (hasFallback)
         {
-            pool.Get(fallback, Quaternion.identity);
+            pools[type.prefab].Get(fallback, Quaternion.identity);
             return true;
         }
 
-        // Ni siquiera un punto valido sobre el NavMesh. No instanciamos uno "roto"
-        // (agente que no se mueve -> colgaria la oleada). Avisamos.
-        Debug.LogWarning(
-            $"EnemySpawner: no encontre un punto valido en {maxSpawnAttempts} intentos " +
-            $"(radio {areaRadius}, NavMesh? distancia minima {minDistanceFromPlayer}). Enemigo omitido.");
+        Debug.LogWarning($"EnemySpawner: sin punto valido en {maxSpawnAttempts} intentos. Enemigo omitido.");
         return false;
     }
 
-    // True si el punto cae dentro del frustum de la camara (lo veria el jugador).
+    // Sorteo ponderado por spawnWeight.
+    EnemyData PickType()
+    {
+        if (enemyTypes == null || enemyTypes.Length == 0) return null;
+        if (totalWeight <= 0f) return enemyTypes[0];
+
+        float r = Random.value * totalWeight;
+        foreach (var t in enemyTypes)
+        {
+            if (t == null || t.prefab == null) continue;
+            r -= Mathf.Max(0f, t.spawnWeight);
+            if (r <= 0f) return t;
+        }
+        return enemyTypes[0];
+    }
+
     bool IsInView(Vector3 worldPos)
     {
         if (cam == null) cam = Camera.main;
-        if (cam == null) return false;   // sin camara, no filtramos por vista
-
+        if (cam == null) return false;
         Vector3 vp = cam.WorldToViewportPoint(worldPos);
         return vp.z > 0f && vp.x >= 0f && vp.x <= 1f && vp.y >= 0f && vp.y <= 1f;
     }

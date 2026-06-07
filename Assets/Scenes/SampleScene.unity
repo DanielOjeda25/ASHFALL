@@ -6359,7 +6359,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50210d59777356446b827b7a5f34a200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  enemyPrefab: {fileID: 2831840330880355044, guid: 8b26e7b3b621c7e43a09aa9a5cb3f869, type: 3}
+  enemyTypes:
+  - {fileID: 11400000, guid: 97d9146ea9bbc574992a088d42033612, type: 2}
+  - {fileID: 11400000, guid: 097a81d4b3436e549abb76599ca81cdb, type: 2}
   areaRadius: 20
   spawnHeight: 1
   minDistanceFromPlayer: 6
@@ -6393,7 +6395,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7088fd2ae2f501c4d8a6e0f73f7a042f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveSystem
-  totalWaves: 0
+  totalWaves: 2
   baseEnemies: 5
   enemiesGrowthPerWave: 3
   maxAliveAtOnce: 20
@@ -6510,7 +6512,6 @@ MonoBehaviour:
   weapon: {fileID: 1482782264}
   waveSystem: {fileID: 1902528918}
   weaponManager: {fileID: 1482782269}
-  lowHealthThreshold: 0.3
 --- !u!114 &2122434681
 MonoBehaviour:
   m_ObjectHideFlags: 0

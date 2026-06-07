@@ -82,8 +82,11 @@ dependen de assets externos; los sonidos necesitan clips que aporta el autor).
   Player (`PlayerHealth.Current`) y hace *throttle* de repath; **object pooling** hecho para
   **enemigos** (`EnemyPool`) y **efectos de impacto** (`PrefabPool` genérico: chispas y marcas).
   Falta: límites de balas/sonidos simultáneos; pooling de proyectiles si hace falta.
-- **Variedad de enemigos tipo SS**: melee que cargan (kamikaze/headless), *ranged*, distintos
-  tamaños — más allá del enemigo-cápsula único actual.
+- **Variedad de enemigos tipo SS**: 🟡 *iniciado* — arquitectura de **estrategia de ataque**
+  (`EnemyAttack` abstracto; `MeleeAttack` y `KamikazeAttack`) + **`EnemyData` (SO)** y spawner
+  multi-tipo con **sorteo ponderado** (pool por prefab). Hechos: **melee** (rojo) y **kamikaze**
+  (naranja: corre, explota en área y se autodestruye). Faltan: **ranged** (dispara a distancia)
+  y **tanque** (lento, mucha vida); enemigos animados (Blender).
 - **Explosiones de área y props destructibles**: ✅ *base hecha* — `Projectile.cs` explota al
   impactar y aplica daño en área con `Physics.OverlapSphere` → `TakeDamage` a todo `IDamageable`
   del radio (con caída por distancia) + **knockback radial**. Usado por el arma en modo
@@ -117,6 +120,8 @@ enemigos por NavMesh, reglas/HUD/game over) ya hay buena parte de la Visión v2.
 - **Arsenal**: `WeaponManager` + Pistola/Escopeta/Bazooka data-driven; knockback; explosión AoE.
 - **Audio**: por arma, pasos, casquillos, cambio de arma, bazooka.
 
-**Siguiente (orden sugerido):** 2º **tipo de enemigo** (melee que carga/kamikaze) → **spawners
-por zonas** → **mapa-arena grande**. Pendientes menores: VFX+clip real de explosión, props
-destructibles, enemigos animados (Blender), más armas. **El mapa grande es el gran salto restante.**
+- **Enemigos**: ✅ kamikaze (2º tipo) + sistema data-driven (`EnemyData` SO) y spawner multi-tipo.
+
+**Siguiente (orden sugerido):** 3er/4º **enemigo** (ranged + tanque) → **spawners por zonas** →
+**mapa-arena grande**. Pendientes menores: VFX+clip real de explosión (bazooka y kamikaze),
+props destructibles, enemigos animados (Blender), más armas. **El mapa grande es el gran salto restante.**

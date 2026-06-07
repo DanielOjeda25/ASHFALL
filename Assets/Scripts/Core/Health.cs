@@ -59,6 +59,14 @@ public abstract class Health : MonoBehaviour, IDamageable
         }
     }
 
+    // Mata al objeto al instante, sin pasar por TakeDamage (lo usa el kamikaze al explotar).
+    public void Kill()
+    {
+        if (isDead) return;
+        isDead = true;
+        OnDeath();
+    }
+
     // Cada subtipo decide QUE pasa al morir (destruirse, avisar a las reglas...).
     protected abstract void OnDeath();
 }
