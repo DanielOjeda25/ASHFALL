@@ -402,6 +402,7 @@ GameObject:
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
   - component: {fileID: 330585548}
+  - component: {fileID: 330585549}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -542,6 +543,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MouseLook
   sensitivity: 0.1
   playerBody: {fileID: 597900052}
+--- !u!114 &330585549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0bd88b887285ea49a9579ba970f4a2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.CameraShake
+  maxPitch: 2.5
+  maxYaw: 2.5
+  maxRoll: 4
+  frequency: 22
+  decay: 1.8
+  maxDistance: 30
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -784,6 +803,8 @@ MonoBehaviour:
   crouchSpeed: 3
   jumpHeight: 1.2
   gravity: -9.81
+  coyoteTime: 0.12
+  jumpBuffer: 0.12
   crouchHeight: 1.3
   crouchTransitionSpeed: 10
 --- !u!143 &597900054
@@ -865,6 +886,12 @@ MonoBehaviour:
   sprintWeaponOffset: {x: 0, y: -0.05, z: -0.1}
   sprintWeaponTilt: {x: 20, y: 0, z: -10}
   feelSpeed: 10
+  walkBobSpeed: 9
+  sprintBobSpeed: 13
+  bobAmpY: 0.02
+  bobAmpX: 0.03
+  landingDipScale: 0.04
+  maxLandingDip: 0.18
 --- !u!114 &597900058
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6366,6 +6393,7 @@ MonoBehaviour:
   muzzlePoint: {fileID: 933630099}
   muzzleLifetime: 0.5
   muzzleSmokeLifetime: 0.8
+  fireShake: 0.15
   worldImpact: {fileID: 1919248165561455267, guid: 56b487179e2e3524eaf3454e857c138c, type: 3}
   fleshImpact: {fileID: 8417165741215866614, guid: cc1233ea9dbd88e49a000c3698ad422a, type: 3}
   impactMark: {fileID: 0}
@@ -6515,6 +6543,50 @@ MonoBehaviour:
   speedGrowthPerWave: 0.05
   maxSpeedMultiplier: 2
   spawner: {fileID: 1902528916}
+--- !u!1 &1985590321
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1985590323}
+  - component: {fileID: 1985590322}
+  m_Layer: 0
+  m_Name: PoolManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1985590322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1985590321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f37e18a32e81a9d42a7b3004ebe118cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.PoolManager
+--- !u!4 &1985590323
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1985590321}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2100669873
 GameObject:
   m_ObjectHideFlags: 0
@@ -6617,6 +6689,7 @@ MonoBehaviour:
   weapon: {fileID: 1482782264}
   waveSystem: {fileID: 1902528918}
   weaponManager: {fileID: 1482782269}
+  playerHitShake: 0.35
 --- !u!114 &2122434681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6671,3 +6744,4 @@ SceneRoots:
   - {fileID: 2100669876}
   - {fileID: 897523159}
   - {fileID: 1240245553}
+  - {fileID: 1985590323}

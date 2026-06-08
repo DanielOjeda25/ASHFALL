@@ -12,6 +12,8 @@ public class Projectile : MonoBehaviour
 {
     public float maxLifetime = 5f;     // si no choca con nada, explota igual (failsafe)
     public GameObject explosionPrefab; // VFX + sonido reutilizable (Explosion)
+    public float explosionLifetime = 2f; // segundos antes de reciclar el VFX de explosion
+    public float explosionShake = 0.6f;  // sacudida de camara (escalada por distancia)
 
     private int damage;
     private int minDamage;
@@ -44,6 +46,7 @@ public class Projectile : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // evita atravesar a alta velocidad
         rb.linearVelocity = velocity;
 
+        CancelInvoke();
         Invoke(nameof(Explode), maxLifetime);
     }
 
@@ -67,6 +70,8 @@ public class Projectile : MonoBehaviour
             float t = Mathf.Clamp01(Vector3.Distance(transform.position, col.transform.position) / radius);
             dmgable.TakeDamage(Mathf.Max(1, Mathf.RoundToInt(Mathf.Lerp(damage, minDamage, t))));
 
+            if (dmgable is PlayerHealth ph) ph.RegisterHit(transform.position);   // por si te pilla tu propia bazooka
+
             // Empuje radial desde el centro de la explosion (menos fuerte en el borde).
             if (knockback > 0f)
             {
@@ -76,11 +81,13 @@ public class Projectile : MonoBehaviour
             }
         }
 
-        // Efecto de explosion (VFX + sonido) reutilizable, sobrevive al Destroy.
+        // Efecto de explosion (VFX + sonido) pooleado (fallback a Instantiate si no hay manager).
         if (explosionPrefab != null)
-            Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            PoolManager.SpawnTimed(explosionPrefab, transform.position, Quaternion.identity, explosionLifetime);
 
-        Destroy(gameObject);
+        CameraShake.AddAt(transform.position, explosionShake);
+
+        PoolManager.Return(gameObject);   // vuelve al pool (o se destruye)
     }
 }
 }

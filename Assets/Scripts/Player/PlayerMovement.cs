@@ -18,6 +18,19 @@ public class PlayerMovement : MonoBehaviour
     [Header("Salto / gravedad")]
     public float jumpHeight = 1.2f;   // metros que sube el salto
     public float gravity = -9.81f;    // negativa = tira hacia abajo
+    public float coyoteTime = 0.12f;  // margen para saltar tras salir de un borde
+    public float jumpBuffer = 0.12f;  // margen para registrar el salto justo antes de aterrizar
+
+    [Header("Dash / esquiva")]
+    public float dashSpeed = 22f;       // velocidad del impulso
+    public float dashDuration = 0.18f;  // cuanto dura el impulso
+
+    [Header("Stamina (la comparten sprint y dash)")]
+    public float maxStamina = 100f;
+    public float sprintDrain = 34f;        // mas alto: el sprint dura menos
+    public float dashCost = 35f;           // gasto por dash (se raciona con el sprint)
+    public float staminaRegen = 28f;       // recuperacion por segundo
+    public float staminaRegenDelay = 0.7f; // respiro tras el ultimo uso antes de regenerar
 
     [Header("Agacharse")]
     public float crouchHeight = 1.3f;          // altura del collider agachado
@@ -30,6 +43,20 @@ public class PlayerMovement : MonoBehaviour
 
     private float standHeight;        // altura "de pie" (la del collider al arrancar)
     private float standCenterY;
+    private float coyoteTimer;        // cuenta atras del coyote time
+    private float jumpBufferTimer;    // cuenta atras del jump buffer
+    private bool wasGrounded;         // para detectar el frame de aterrizaje
+    private float dashTimer;          // tiempo restante del dash en curso
+    private Vector3 dashDir;          // direccion del dash actual
+    private float stamina;
+    private float lastStaminaUse;
+    private bool exhausted;           // true al agotar stamina; se limpia al recuperar 30%
+
+    public bool IsDashing => dashTimer > 0f;
+    public float Stamina01 => maxStamina > 0f ? stamina / maxStamina : 0f;
+
+    // Se dispara al aterrizar; el float es la velocidad de caida (para el dip de camara).
+    public event System.Action<float> Landed;
 
     // Estado expuesto para el feel visual y el audio (pasos).
     public bool IsSprinting => isSprinting;
@@ -44,6 +71,7 @@ public class PlayerMovement : MonoBehaviour
         controller = GetComponent<CharacterController>();
         standHeight = controller.height;       // tomamos la altura actual como "de pie"
         standCenterY = controller.center.y;
+        stamina = maxStamina;
     }
 
     void Update()
@@ -69,23 +97,82 @@ public class PlayerMovement : MonoBehaviour
         Vector3 move = transform.right * input.x + transform.forward * input.y;
         move = Vector3.ClampMagnitude(move, 1f); // la diagonal no debe ir mas rapida
 
-        // --- Sprint: Shift + avanzando + no agachado ---
-        isSprinting = kb != null && kb.leftShiftKey.isPressed && input.y > 0.1f && !isCrouching;
+        // --- Sprint: Shift + avanzando + no agachado, y CON stamina ---
+        // Si la agotas, quedas "exhausted" hasta recuperar el 30% (evita parpadeo cerca de 0).
+        if (stamina <= 0f) exhausted = true;
+        else if (exhausted && stamina >= maxStamina * 0.3f) exhausted = false;
+        bool wantsSprint = kb != null && kb.leftShiftKey.isPressed && input.y > 0.1f && !isCrouching;
+        isSprinting = wantsSprint && !exhausted;
 
         float speed = isCrouching ? crouchSpeed : (isSprinting ? sprintSpeed : walkSpeed);
 
-        // --- Salto / gravedad ---
-        if (controller.isGrounded && verticalVelocity < 0f)
+        // --- Salto / gravedad (con coyote time + jump buffer) ---
+        bool grounded = controller.isGrounded;
+
+        // Aterrizaje: al pasar de aire a suelo avisamos con la velocidad de caida
+        // (para el dip de camara). ANTES de resetear verticalVelocity.
+        if (grounded && !wasGrounded && -verticalVelocity > 0.1f)
+            Landed?.Invoke(-verticalVelocity);
+        wasGrounded = grounded;
+
+        // Coyote: en suelo se recarga; en el aire se gasta (deja saltar un pelin tarde).
+        coyoteTimer = grounded ? coyoteTime : coyoteTimer - Time.deltaTime;
+        // Buffer: al pulsar salto se abre la ventana; si no, se cierra (deja pulsar un pelin pronto).
+        if (kb != null && kb.spaceKey.wasPressedThisFrame) jumpBufferTimer = jumpBuffer;
+        else jumpBufferTimer -= Time.deltaTime;
+
+        if (grounded && verticalVelocity < 0f)
             verticalVelocity = -2f; // pequeno, para mantener pegado al suelo
 
-        if (kb != null && kb.spaceKey.wasPressedThisFrame && controller.isGrounded && !isCrouching)
+        // Salta si hay salto en cola Y aun queda coyote, y no estamos agachados.
+        if (jumpBufferTimer > 0f && coyoteTimer > 0f && !isCrouching)
+        {
             verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity); // v = sqrt(2*g*h)
+            jumpBufferTimer = 0f;
+            coyoteTimer = 0f;   // consumido (no doble salto)
+        }
 
         verticalVelocity += gravity * Time.deltaTime;
 
-        // --- Aplicar todo en un solo Move ---
-        Vector3 velocity = move * speed + Vector3.up * verticalVelocity;
+        // --- Dash / esquiva (Alt izq): gasta stamina (se raciona con el sprint) ---
+        if (kb != null && kb.leftAltKey.wasPressedThisFrame && !isCrouching && stamina >= dashCost)
+        {
+            // Hacia donde te mueves; si estas quieto, hacia donde miras.
+            dashDir = move.sqrMagnitude > 0.01f ? move.normalized : transform.forward;
+            dashDir.y = 0f;
+            dashDir = dashDir.normalized;
+            dashTimer = dashDuration;
+            stamina -= dashCost;          // el dash bebe de la misma stamina que el sprint
+            lastStaminaUse = Time.time;
+        }
+
+        // Durante el dash, la horizontal se sustituye por el impulso (ignora walk/sprint).
+        Vector3 horizontal;
+        if (dashTimer > 0f)
+        {
+            dashTimer -= Time.deltaTime;
+            horizontal = dashDir * dashSpeed;
+        }
+        else
+        {
+            horizontal = move * speed;
+        }
+
+        // --- Aplicar todo en un solo Move (horizontal + vertical) ---
+        Vector3 velocity = horizontal + Vector3.up * verticalVelocity;
         controller.Move(velocity * Time.deltaTime);
+
+        // --- Stamina: el sprint la gasta; se regenera tras un respiro sin usarla ---
+        if (isSprinting)
+        {
+            stamina -= sprintDrain * Time.deltaTime;
+            lastStaminaUse = Time.time;
+        }
+        else if (Time.time >= lastStaminaUse + staminaRegenDelay)
+        {
+            stamina += staminaRegen * Time.deltaTime;
+        }
+        stamina = Mathf.Clamp(stamina, 0f, maxStamina);
     }
 
     void UpdateCrouch(bool crouchHeld)

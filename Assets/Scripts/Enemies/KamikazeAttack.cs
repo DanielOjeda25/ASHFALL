@@ -19,6 +19,8 @@ public class KamikazeAttack : EnemyAttack
     public float knockback = 6f;
     public LayerMask hitMask = ~0;
     public GameObject explosionPrefab;   // VFX + sonido reutilizable (Explosion)
+    public float explosionLifetime = 2f; // segundos antes de reciclar el VFX
+    public float explosionShake = 0.5f;  // sacudida de camara (escalada por distancia)
 
     private EnemyHealth self;
     private bool hasExploded;
@@ -65,7 +67,9 @@ public class KamikazeAttack : EnemyAttack
                 continue;
 
             float t = Mathf.Clamp01(Vector3.Distance(transform.position, col.transform.position) / radius);
-            dmgable.TakeDamage(Mathf.Max(1, Mathf.RoundToInt(damage * (1f - t))));  // puede matar a otro kamikaze -> cadena
+            dmgable.TakeDamage(Mathf.Max(1, Mathf.RoundToInt(damage * (1f - t) * Difficulty.EnemyDamage)));  // puede matar a otro kamikaze -> cadena
+
+            if (dmgable is PlayerHealth ph) ph.RegisterHit(transform.position);   // indicador direccional + shake
 
             if (knockback > 0f)
             {
@@ -76,7 +80,9 @@ public class KamikazeAttack : EnemyAttack
         }
 
         if (explosionPrefab != null)
-            Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            PoolManager.SpawnTimed(explosionPrefab, transform.position, Quaternion.identity, explosionLifetime);
+
+        CameraShake.AddAt(transform.position, explosionShake);
     }
 }
 }

@@ -13,7 +13,11 @@ public class MeleeAttack : EnemyAttack
     {
         var damageable = target.GetComponent<IDamageable>();
         if (damageable != null)
-            damageable.TakeDamage(damage);
+            damageable.TakeDamage(Mathf.Max(1, Mathf.RoundToInt(damage * Difficulty.EnemyDamage)));
+
+        // Si golpeamos al jugador, le decimos DESDE DONDE (indicador direccional + shake).
+        var ph = target.GetComponent<PlayerHealth>();
+        if (ph != null) ph.RegisterHit(transform.position);
     }
 }
 }

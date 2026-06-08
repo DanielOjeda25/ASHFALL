@@ -28,6 +28,13 @@ public class CrosshairArcs : VisualElement
     private float circleRadius = 9f;
     public float CircleRadius { set { circleRadius = Mathf.Max(2f, value); MarkDirtyRepaint(); } }
 
+    // Apertura extra de la mira (px) por la dispersion dinamica del arma al moverse.
+    private float bloom;
+    public float Bloom
+    {
+        set { float v = Mathf.Max(0f, value); if (Mathf.Abs(v - bloom) > 0.1f) { bloom = v; MarkDirtyRepaint(); } }
+    }
+
     // Lo llama el HUD en cada disparo: los arcos se "abren" y vuelven solos.
     public void Kick() { kick = 1f; MarkDirtyRepaint(); }
 
@@ -38,6 +45,7 @@ public class CrosshairArcs : VisualElement
     const float AnimSpeed = 8f;
     const float LowThreshold = 0.3f;
     const float KickExpand = 9f;     // px que se abren los arcos al disparar
+    const float ReticleKick = 7f;    // px que se abre la mira central al disparar
     const float SpinSpeed = 7f;      // grados por tick del spinner de recarga
 
     // Si la descarga sale al reves, cambia esto a false.
@@ -45,6 +53,26 @@ public class CrosshairArcs : VisualElement
 
     private float kick;
     private float spin;
+
+    // Indicadores direccionales de dano (estilo CS): arcos rojos alrededor de la mira
+    // que apuntan al origen del golpe y se desvanecen.
+    const int MaxDamage = 6;
+    const float DamageLife = 1.3f;                      // segundos que dura cada indicador
+    readonly float[] dmgAngle = new float[MaxDamage];   // angulo: 0=de frente, +=derecha
+    readonly float[] dmgLife = new float[MaxDamage];    // 1..0 (se desvanece)
+
+    // Lo llama el HUD al recibir dano. angleFromFront: 0=de frente, +90=derecha,
+    // -90=izquierda, +-180=a la espalda.
+    public void AddDamage(float angleFromFront)
+    {
+        int slot = 0; float lowest = float.MaxValue;        // reusa el slot mas gastado
+        for (int i = 0; i < MaxDamage; i++)
+            if (dmgLife[i] < lowest) { lowest = dmgLife[i]; slot = i; }
+        dmgAngle[slot] = angleFromFront;
+        dmgLife[slot] = 1f;
+        MarkDirtyRepaint();
+    }
+
 
     static readonly Color Track = new Color(0.843f, 0.910f, 0.816f, 0.15f);
     static readonly Color Bone  = new Color(0.843f, 0.910f, 0.816f);
@@ -80,6 +108,13 @@ public class CrosshairArcs : VisualElement
             changed = true;
         }
 
+        for (int i = 0; i < MaxDamage; i++)
+            if (dmgLife[i] > 0f)
+            {
+                dmgLife[i] = Mathf.Max(0f, dmgLife[i] - 0.016f / DamageLife);
+                changed = true;
+            }
+
         if (changed) MarkDirtyRepaint();
     }
 
@@ -113,6 +148,27 @@ public class CrosshairArcs : VisualElement
         }
 
         DrawReticle(p, c);   // mira central segun el arma (siempre visible)
+        DrawDamage(p, c);    // indicadores direccionales de dano (si los hay)
+    }
+
+    // Arcos rojos que apuntan al origen del dano reciente y se desvanecen.
+    void DrawDamage(Painter2D p, Vector2 c)
+    {
+        // Radio amplio: hacia los laterales/bordes, NO pegado a la mira. Grande y grueso.
+        float r = Mathf.Min(contentRect.width, contentRect.height) * 0.30f;
+        const float half = 26f;
+        p.lineWidth = 14f;
+        for (int i = 0; i < MaxDamage; i++)
+        {
+            if (dmgLife[i] <= 0f) continue;
+            // En pantalla Painter2D 0deg=derecha y crece en horario; "de frente"=arriba=270.
+            float screen = 270f + dmgAngle[i];
+            Color col = Warn; col.a = Mathf.Clamp01(dmgLife[i]);
+            p.strokeColor = col;
+            p.BeginPath();
+            p.Arc(c, r, Deg(screen - half), Deg(screen + half));
+            p.Stroke();
+        }
     }
 
     // Circulo casi-completo que gira: indica "recargando, no puedes disparar".
@@ -131,24 +187,26 @@ public class CrosshairArcs : VisualElement
         p.strokeColor = Bone;
         p.fillColor = Bone;
 
+        float e = kick * ReticleKick + bloom;   // apertura: disparo (decae) + dispersion por movimiento
+
         switch (reticle)
         {
             case CrosshairStyle.Dot:
                 p.BeginPath();
-                p.Arc(c, 2.5f, Deg(0), Deg(360));
+                p.Arc(c, 2.5f + e * 0.4f, Deg(0), Deg(360));   // leve pulso
                 p.Fill();
                 break;
 
             case CrosshairStyle.Circle:
                 p.lineWidth = 2f;
                 p.BeginPath();
-                p.Arc(c, circleRadius, Deg(0), Deg(360));
+                p.Arc(c, circleRadius + e, Deg(0), Deg(360));  // el circulo crece al disparar
                 p.Stroke();
                 break;
 
             default: // Cross: cuatro marcas con hueco central
                 p.lineWidth = 2f;
-                float g = 4f, len = 7f;
+                float g = 4f + e, len = 7f;   // el hueco central se abre al disparar
                 Line(p, new Vector2(c.x, c.y - g), new Vector2(c.x, c.y - g - len));
                 Line(p, new Vector2(c.x, c.y + g), new Vector2(c.x, c.y + g + len));
                 Line(p, new Vector2(c.x - g, c.y), new Vector2(c.x - g - len, c.y));

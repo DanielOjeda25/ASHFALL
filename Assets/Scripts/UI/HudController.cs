@@ -16,8 +16,14 @@ public class HudController : MonoBehaviour
     public WaveSystem waveSystem;
     public WeaponManager weaponManager;
 
+    [Header("Feedback de dano")]
+    public float playerHitShake = 0.35f;   // sacudida de camara al recibir dano
+
     private Label healthValue, ammoValue, weaponName, waveValue;
     private CrosshairArcs crosshair;   // arcos del reticle (vida/escudo/cargador/reserva)
+    private DamageVignette vignette;   // bordes rojos al recibir dano / vida baja
+    private Camera cam;                // para calcular la direccion del dano (cacheada)
+    private PlayerMovement playerMovement;  // para mostrar la stamina (sprint/dash)
 
     void OnEnable()
     {
@@ -26,6 +32,7 @@ public class HudController : MonoBehaviour
         if (weapon != null) weapon.Fired += OnFired;
         if (waveSystem != null) waveSystem.WaveChanged += OnWaveChanged;
         if (weaponManager != null) weaponManager.WeaponSwitched += OnWeaponSwitched;
+        if (playerHealth != null) playerHealth.Hit += OnPlayerHit;
     }
 
     void OnDisable()
@@ -35,6 +42,22 @@ public class HudController : MonoBehaviour
         if (weapon != null) weapon.Fired -= OnFired;
         if (waveSystem != null) waveSystem.WaveChanged -= OnWaveChanged;
         if (weaponManager != null) weaponManager.WeaponSwitched -= OnWeaponSwitched;
+        if (playerHealth != null) playerHealth.Hit -= OnPlayerHit;
+    }
+
+    // Al recibir dano: arco rojo apuntando al origen + sacudida de camara.
+    void OnPlayerHit(Vector3 source)
+    {
+        if (cam == null) cam = Camera.main;
+        if (cam != null && crosshair != null)
+        {
+            Vector3 to = source - cam.transform.position; to.y = 0f;
+            Vector3 fwd = cam.transform.forward; fwd.y = 0f;
+            if (to.sqrMagnitude > 0.0001f && fwd.sqrMagnitude > 0.0001f)
+                crosshair.AddDamage(Vector3.SignedAngle(fwd, to, Vector3.up));  // 0=frente, +=derecha
+        }
+        if (vignette != null) vignette.Pulse();   // borde rojo al recibir dano
+        CameraShake.Add(playerHitShake);
     }
 
     void OnFired()
@@ -52,16 +75,32 @@ public class HudController : MonoBehaviour
         weaponName = root.Q<Label>("weapon-name");
         waveValue = root.Q<Label>("wave-value");
 
-        // Reticle con arcos: lo creamos por codigo y lo anadimos como overlay.
+        // Vineta de dano: overlay DETRAS del texto del HUD (Insert(0)).
+        vignette = new DamageVignette();
+        root.Insert(0, vignette);
+
+        // Reticle con arcos: lo creamos por codigo y lo anadimos como overlay (encima).
         crosshair = new CrosshairArcs();
         root.Add(crosshair);
-        crosshair.Shield = 1f;    // placeholder hasta que exista el sistema de escudo
+        // El arco superior-izquierdo (antes "escudo") muestra la STAMINA (sprint/dash).
+        playerMovement = playerHealth != null ? playerHealth.GetComponent<PlayerMovement>() : null;
+        crosshair.Shield = playerMovement != null ? playerMovement.Stamina01 : 1f;
         crosshair.Reserve = 1f;   // placeholder hasta que exista la municion de reserva
 
         RefreshHealth();
         RefreshAmmo();
         RefreshWave();
         if (weaponManager != null) SetWeaponName(weaponManager.CurrentWeapon);
+    }
+
+    void Update()
+    {
+        // La stamina y las cargas de dash cambian continuamente -> se refrescan cada frame.
+        if (crosshair != null && playerMovement != null)
+            crosshair.Shield = playerMovement.Stamina01;   // arco sup-izq = stamina (sprint+dash)
+        // La mira se abre segun la dispersion actual del arma (preciso parado, abierto al moverse).
+        if (crosshair != null && weapon != null)
+            crosshair.Bloom = weapon.CurrentSpread * 2.5f;
     }
 
     void OnHealthChanged(int current, int max) => RefreshHealth();
@@ -75,6 +114,8 @@ public class HudController : MonoBehaviour
 
         if (healthValue != null) healthValue.text = cur.ToString();
         if (crosshair != null) crosshair.Health = pct;   // arco de vida del reticle
+        // Tinte rojo persistente: empieza por debajo del 50% de vida, maximo al borde de morir.
+        if (vignette != null) vignette.LowHealth = 1f - Mathf.Clamp01(pct / 0.5f);
     }
 
     void RefreshAmmo()

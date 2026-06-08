@@ -27,6 +27,9 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
     // Corto a proposito: empuje visible pero recupera la persecucion casi al instante.
     // Si fuera largo, disparar rapido encadenaria el aturdimiento y "congelaria" al enemigo.
     public float knockbackDuration = 0.08f;  // duracion del empujon + mini-aturdimiento
+    // Resistencia al empuje POR TIPO de enemigo: 1 = normal; <1 pesado/tanque (se mueve
+    // menos); >1 ligero (sale mas disparado). Se multiplica por la fuerza del arma.
+    public float knockbackMultiplier = 1f;
 
     private NavMeshAgent agent;
     private EnemyAttack attack;            // estrategia de ataque (melee, a distancia, kamikaze...)
@@ -58,8 +61,8 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
         knockbackTimer = 0f;            // por si se reutiliza desde el pool
         knockbackVel = Vector3.zero;    // sin empuje residual de la vida anterior
 
-        // Velocidad escalada por la dificultad de la oleada actual.
-        if (agent != null) agent.speed = baseSpeed * Difficulty.speedMultiplier;
+        // Velocidad escalada por la dificultad (nivel + oleada).
+        if (agent != null) agent.speed = baseSpeed * Difficulty.EnemySpeed;
 
         // Enemigos a distancia: la rotacion la llevamos nosotros (mirar al jugador), no
         // el agente (que miraria a su destino de movimiento).
@@ -73,7 +76,7 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
         direction.y = 0f;                       // empuje horizontal, no hacia arriba
         if (direction.sqrMagnitude < 0.0001f) return;
 
-        knockbackVel = direction.normalized * force;
+        knockbackVel = direction.normalized * force * knockbackMultiplier;  // pesado resiste, ligero vuela
         knockbackTimer = knockbackDuration;
         agent.isStopped = true;                 // deja de perseguir mientras dura
     }
@@ -105,7 +108,8 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
         // En rango + sin cooldown -> delegamos el efecto a la estrategia de ataque.
         // sqrMagnitude (sin sqrt) para no pagar una raiz por enemigo cada frame.
         Vector3 toTarget = target.position - transform.position;
-        if (toTarget.sqrMagnitude <= attackRange * attackRange && Time.time >= lastAttackTime + attackCooldown)
+        if (toTarget.sqrMagnitude <= attackRange * attackRange
+            && Time.time >= lastAttackTime + attackCooldown * Difficulty.AttackCooldown)
         {
             lastAttackTime = Time.time;
             attack?.Execute(target);
