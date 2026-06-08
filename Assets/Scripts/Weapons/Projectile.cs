@@ -11,7 +11,7 @@ namespace ShooterDem
 public class Projectile : MonoBehaviour
 {
     public float maxLifetime = 5f;     // si no choca con nada, explota igual (failsafe)
-    public AudioClip explosionClip;    // sonido al explotar (lo pone el prefab)
+    public GameObject explosionPrefab; // VFX + sonido reutilizable (Explosion)
 
     private int damage;
     private int minDamage;
@@ -76,12 +76,10 @@ public class Projectile : MonoBehaviour
             }
         }
 
-        // Sonido de explosion en el punto (PlayClipAtPoint crea un altavoz temporal
-        // que sobrevive al Destroy de este proyectil).
-        if (explosionClip != null)
-            AudioSource.PlayClipAtPoint(explosionClip, transform.position);
+        // Efecto de explosion (VFX + sonido) reutilizable, sobrevive al Destroy.
+        if (explosionPrefab != null)
+            Instantiate(explosionPrefab, transform.position, Quaternion.identity);
 
-        // De momento se destruye; el efecto visual de explosion vendra luego.
         Destroy(gameObject);
     }
 }

@@ -22,6 +22,9 @@ public abstract class Health : MonoBehaviour, IDamageable
     // (vidaActual, vidaMax) cada vez que recibe dano. Lo consume el HUD.
     public event Action<int, int> Damaged;
 
+    // Se dispara al morir, ANTES de OnDeath (p. ej. el kamikaze explota al morir por balas).
+    public event Action Died;
+
     // virtual: los subtipos pueden ampliar Awake (p. ej. anunciar su nacimiento)
     // pero deben llamar a base.Awake() para inicializar la vida.
     protected virtual void Awake()
@@ -53,17 +56,18 @@ public abstract class Health : MonoBehaviour, IDamageable
         Damaged?.Invoke(currentHealth, maxHealth);
 
         if (currentHealth <= 0)
-        {
-            isDead = true;
-            OnDeath();
-        }
+            Die();
     }
 
     // Mata al objeto al instante, sin pasar por TakeDamage (lo usa el kamikaze al explotar).
-    public void Kill()
+    public void Kill() => Die();
+
+    // Camino UNICO de muerte: marca, avisa (Died) y delega el QUE pasa en OnDeath.
+    private void Die()
     {
         if (isDead) return;
         isDead = true;
+        Died?.Invoke();
         OnDeath();
     }
 

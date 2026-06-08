@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.EnemyData
   enemyName: Kamikaze
   prefab: {fileID: 2831840330880355044, guid: e9605ed8025590f46b152d8dd8d311d5, type: 3}
-  spawnWeight: 0.5
+  spawnWeight: 3

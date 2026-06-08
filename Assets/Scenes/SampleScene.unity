@@ -1077,6 +1077,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &897523157
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 897523159}
+  - component: {fileID: 897523158}
+  m_Layer: 0
+  m_Name: BloodDecalManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &897523158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 897523157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04e7b5d2fb858d04b9f1cabddc820483, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.BloodDecalManager
+  decalPrefab: {fileID: 6158791720132510555, guid: fec447f082ab79d4786699a3650e5f90, type: 3}
+  maxDecals: 60
+  minSize: 0.8
+  maxSize: 1.8
+  surfaceOffset: 0.02
+--- !u!4 &897523159
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 897523157}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &933630098
 GameObject:
   m_ObjectHideFlags: 0
@@ -6153,7 +6202,7 @@ MonoBehaviour:
   fpsCamera: {fileID: 330585545}
   hitMask:
     serializedVersion: 2
-    m_Bits: 4294967039
+    m_Bits: 55
 --- !u!82 &1482782265
 AudioSource:
   m_ObjectHideFlags: 0
@@ -6263,11 +6312,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7996164d1acee6f48ae523f2344fafd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponEffects
-  muzzleFlash: {fileID: 933630101}
-  impactSparks: {fileID: 8990252747512228723, guid: 580a28dcbf75b8c458effb63cf8316bf, type: 3}
-  impactMark: {fileID: 6042170179556387630, guid: 546f583b21666e145b5cad94a78e6c6e, type: 3}
-  sparksLifetime: 1
-  impactLifetime: 5
+  muzzleFlashPrefab: {fileID: 8078720523478869859, guid: 4f5fc4bbd01b03a4499a6ed77f175fc7, type: 3}
+  muzzleSmokePrefab: {fileID: 8068755405665617710, guid: 15f2338367cd3c947aa6f69c9aa220fe, type: 3}
+  muzzlePoint: {fileID: 933630099}
+  muzzleLifetime: 0.5
+  muzzleSmokeLifetime: 0.8
+  worldImpact: {fileID: 1919248165561455267, guid: 56b487179e2e3524eaf3454e857c138c, type: 3}
+  fleshImpact: {fileID: 8417165741215866614, guid: cc1233ea9dbd88e49a000c3698ad422a, type: 3}
+  impactMark: {fileID: 0}
+  impactVfxLifetime: 6.5
+  impactMarkLifetime: 5
 --- !u!114 &1482782267
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6564,3 +6618,4 @@ SceneRoots:
   - {fileID: 2122434682}
   - {fileID: 1180645023}
   - {fileID: 2100669876}
+  - {fileID: 897523159}

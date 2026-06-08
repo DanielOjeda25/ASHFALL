@@ -154,4 +154,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   maxLifetime: 5
-  explosionClip: {fileID: 8300000, guid: cc19abe29a7eb32449646cee876314e2, type: 3}
+  explosionPrefab: {fileID: 9123729595262269539, guid: 9734d7d4776f10d41b0757fbce15df23, type: 3}
