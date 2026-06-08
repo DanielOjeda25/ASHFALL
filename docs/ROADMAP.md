@@ -95,12 +95,20 @@ dependen de assets externos; los sonidos necesitan clips que aporta el autor).
   pack Gabriel Aguiar). Falta: **clip real** de sonido (ahora placeholder) y props destructibles
   (objetos `IDamageable` que al morir se cambian por escombros). Descartado: deformación real del
   terreno (caro + choca NavMesh).
-- **Personajes y animaciones realistas (Blender → Unity)**: modelar/riggear/animar en
-  Blender y exportar `.fbx` (malla + armature + clips). Dos frentes: **viewmodel de brazos+arma**
-  para el FPS, y sobre todo **enemigos animados** (idle/andar/atacar/morir) — los que más se notan.
-  En Unity: Rig Humanoid (permite reusar animaciones de **Mixamo**) + **Animator Controller**
-  (máquina de estados con parámetros). El recoil procedural por código puede convivir encima de
-  las animaciones o sustituirse por una animación de disparo. Reemplazaría las cápsulas placeholder.
+- **Personajes y animaciones (modelos 3D)**: 🟡 *plan definido — **SIGUIENTE TAREA***. Reemplazar
+  las **cápsulas placeholder** por un **maniquí humanoide animado**. Decisión tomada:
+  - **Modelo + locomoción**: Unity **"Starter Assets – ThirdPerson (URP)"** (gratis) — trae el
+    **mannequin gris** (`Armature_Mesh`, estilo maniquí de Unreal) + Animator con **idle/walk/run/jump**.
+    Su `ThirdPersonController` es para el JUGADOR; para los **enemigos** usamos solo su **modelo + animaciones**.
+  - **Combate**: **Mixamo** (Adobe, gratis) para **Attack** y **Death** (+ hit reaction) — el pack NO
+    los trae. Bajar en *FBX for Unity*, *Without Skin*. Compatibles porque todo es **rig Humanoid**.
+    (Alternativa de modelo: Mixamo `Y Bot`/`X Bot`, también maniquí gris.)
+  - **Pasos de integración (pendientes)**: (1) importar Starter Assets + bajar Attack/Death de Mixamo;
+    (2) Rig = **Humanoid** en los FBX; (3) **Animator Controller para enemigos** (idle ↔ walk ↔ attack ↔
+    death con parámetros); (4) script puente Animator↔`EnemyAI` (velocidad→walk, ataque en rango→attack,
+    `Health.Died`→death) que **reemplaza la cápsula** del prefab; (5) empezar por el **melee**, luego
+    replicar a kamikaze/ranged/tank. A futuro: **viewmodel de brazos+arma** para el FPS.
+  - El recoil procedural por código puede convivir encima de las animaciones de disparo.
 - **Arsenal**: ✅ *hecho (base)* — armas **dirigidas por datos** (`WeaponData`: daño, falloff,
   cargador, audio por arma, `ejectsShell`, etc.) con **3 formas de disparo** (`Single` raycast,
   `Shotgun` N perdigones, `Projectile` con AoE). **`WeaponManager`** (inventario + cambio con
@@ -122,13 +130,19 @@ enemigos por NavMesh, reglas/HUD/game over) ya hay buena parte de la Visión v2.
 - **Arsenal**: `WeaponManager` + Pistola/Escopeta/Bazooka data-driven; knockback; explosión AoE.
 - **Audio**: por arma, pasos, casquillos, cambio de arma, bazooka.
 
-- **Enemigos**: ✅ kamikaze (2º tipo) con **explosión en cadena** + sistema data-driven
-  (`EnemyData` SO) y spawner multi-tipo.
+- **Enemigos**: ✅ **4 tipos** — melee, **kamikaze** (explosión en cadena), **ranged** (proyectil
+  esquivable, mantiene distancia) y **tanque** (lento, mucha vida, golpe fuerte). Sistema data-driven
+  (`EnemyData` SO) + spawner multi-tipo ponderado.
 - **VFX (realistas, URP)**: ✅ migrados a **packs gratis** (Vefects Free Blood/Free Fire,
   Gabriel Aguiar Free Quick Effects); `WeaponEffects` con pooling — fogonazo/humo/impacto/sangre
   y explosión por prefab. Tamaño/color en el prefab, no en código.
-- **Gore**: ✅ **sangre persistente** en el suelo (`BloodDecalManager`: decals con tope para hordas).
+- **Gore**: ✅ decals **persistentes** (`SurfaceDecalPool` + `Blood`/`BulletDecalManager`): **agujeros
+  de bala** en el mundo y **charcos de sangre** en el suelo (tope para hordas), + **marcas de sangre en
+  el cuerpo** del enemigo (`BodyDecals`, se limpian al reciclar del pool).
 
-**Siguiente (orden sugerido):** 3er/4º **enemigo** (ranged + tanque) → **spawners por zonas** →
-**mapa-arena grande**. Pendientes menores: **clip real** de sonido de explosión, props
-destructibles, enemigos animados (Blender), más armas. **El mapa grande es el gran salto restante.**
+**Siguiente (orden sugerido):** 🎯 **MODELOS 3D ANIMADOS** — reemplazar las cápsulas por el maniquí
+de **Starter Assets – ThirdPerson (URP)** (locomoción incluida) + **Mixamo** (attack/death). Ver el
+detalle y los **pasos pendientes** en el pilar *"Personajes y animaciones (modelos 3D)"* de arriba.
+Después: **spawners por zonas** → **mapa-arena grande** (el gran salto restante).
+Pendientes menores: clip real de sonido de explosión, props destructibles, más armas, **decals de
+bala por superficie** (sistema propio del autor, a futuro).
