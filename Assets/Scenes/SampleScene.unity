@@ -6088,6 +6088,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1240245551
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1240245553}
+  - component: {fileID: 1240245552}
+  m_Layer: 0
+  m_Name: BulletDecalManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1240245552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240245551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45b4bb889b0f7574db7bc12f6977cb77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.BulletDecalManager
+  decalPrefab: {fileID: 6158791720132510555, guid: 1a259ef7820d0df4abc78110e83ef50b, type: 3}
+  maxDecals: 80
+  minSize: 0.15
+  maxSize: 0.35
+  surfaceOffset: 0.03
+--- !u!4 &1240245553
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240245551}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1482782259
 GameObject:
   m_ObjectHideFlags: 0
@@ -6416,6 +6465,8 @@ MonoBehaviour:
   enemyTypes:
   - {fileID: 11400000, guid: 97d9146ea9bbc574992a088d42033612, type: 2}
   - {fileID: 11400000, guid: 097a81d4b3436e549abb76599ca81cdb, type: 2}
+  - {fileID: 11400000, guid: 719619f383f025a48aef1cbcffe3332c, type: 2}
+  - {fileID: 11400000, guid: 9f1ae1af80913f446b1887bcc8501995, type: 2}
   areaRadius: 20
   spawnHeight: 1
   minDistanceFromPlayer: 6
@@ -6619,3 +6670,4 @@ SceneRoots:
   - {fileID: 1180645023}
   - {fileID: 2100669876}
   - {fileID: 897523159}
+  - {fileID: 1240245553}

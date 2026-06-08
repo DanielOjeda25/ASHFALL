@@ -67,29 +67,36 @@ public class WeaponEffects : MonoBehaviour
             // La sangre es un splat de SUELO: si lo dejamos en el cuerpo del enemigo
             // queda flotando. Lanzamos un rayo hacia abajo y lo posamos en el suelo
             // (saltando al propio enemigo), orientado segun la superficie.
-            Vector3 pos = hit.point;
-            Vector3 groundNormal = Vector3.up;
-            Quaternion rot = Quaternion.identity;
-            bool onGround = false;
+            // 1) Marca de sangre PEGADA al cuerpo del enemigo (se mueve con el y se borra al
+            //    reciclarlo del pool).
+            var body = hit.collider.GetComponentInParent<BodyDecals>();
+            if (body != null) body.Add(hit.point, hit.normal);
+
+            // 2) Spray + mancha en el SUELO bajo el impacto: rayo hacia abajo, saltando al
+            //    propio enemigo. El spray se posa TUMBADO en el suelo (no flota en el aire).
             int n = Physics.RaycastNonAlloc(hit.point + Vector3.up * 0.05f, Vector3.down,
                 downBuffer, 8f, ~0, QueryTriggerInteraction.Ignore);
             float best = float.MaxValue;
+            Vector3 groundPos = Vector3.zero, groundNormal = Vector3.up;
+            bool onGround = false;
             for (int i = 0; i < n; i++)
             {
                 var dh = downBuffer[i];
-                if (dh.collider.GetComponentInParent<IDamageable>() != null) continue; // ignora enemigos
+                if (dh.collider.GetComponentInParent<IDamageable>() != null) continue;
                 if (dh.distance < best)
                 {
                     best = dh.distance;
-                    pos = dh.point;
+                    groundPos = dh.point;
                     groundNormal = dh.normal;
-                    rot = Quaternion.FromToRotation(Vector3.up, dh.normal);
                     onGround = true;
                 }
             }
-            SpawnWorld(fleshPool, pos, rot, impactVfxLifetime);          // spray que se desvanece
-            if (onGround && BloodDecalManager.Instance != null)
-                BloodDecalManager.Instance.Spawn(pos, groundNormal);     // mancha PERSISTENTE
+            if (onGround)
+            {
+                SpawnWorld(fleshPool, groundPos, Quaternion.FromToRotation(Vector3.up, groundNormal), impactVfxLifetime);
+                if (BloodDecalManager.Instance != null)
+                    BloodDecalManager.Instance.Spawn(groundPos, groundNormal);
+            }
             return;
         }
 
@@ -97,6 +104,10 @@ public class WeaponEffects : MonoBehaviour
         Quaternion wrot = hit.normal != Vector3.zero
             ? Quaternion.LookRotation(hit.normal) : Quaternion.identity;
         SpawnWorld(worldPool, hit.point, wrot, impactVfxLifetime);
+
+        // Agujero de bala PERSISTENTE en la superficie del mundo.
+        if (BulletDecalManager.Instance != null)
+            BulletDecalManager.Instance.Spawn(hit.point, hit.normal);
 
         if (marksPool != null)
         {

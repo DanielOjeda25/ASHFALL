@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2831840330880355044
+--- !u!1 &5160984221567826720
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,53 +8,53 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7954721320900113162}
-  - component: {fileID: 8775898448691465299}
-  - component: {fileID: 4306374882981828402}
-  - component: {fileID: 8801000480988376781}
-  - component: {fileID: 7507980568933211391}
-  - component: {fileID: 465232333264661650}
-  - component: {fileID: 9202119039673708271}
-  - component: {fileID: 6663807122022670052}
-  - component: {fileID: 730487076016756067}
-  - component: {fileID: 5585052212129938348}
+  - component: {fileID: 4438767300494354608}
+  - component: {fileID: 2758618751581782513}
+  - component: {fileID: 8534393233555711867}
+  - component: {fileID: 2384255399202144893}
+  - component: {fileID: 5714812089412718588}
+  - component: {fileID: 3896646673404351636}
+  - component: {fileID: 4087931135387411761}
+  - component: {fileID: 6692991105664447759}
+  - component: {fileID: 8673272156260448773}
+  - component: {fileID: 1528317225319506113}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: TankEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7954721320900113162
+--- !u!4 &4438767300494354608
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2831840330880355044}
+  m_GameObject: {fileID: 5160984221567826720}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 6}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.6, y: 1.6, z: 1.6}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &8775898448691465299
+--- !u!33 &2758618751581782513
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2831840330880355044}
+  m_GameObject: {fileID: 5160984221567826720}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &4306374882981828402
+--- !u!23 &8534393233555711867
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2831840330880355044}
+  m_GameObject: {fileID: 5160984221567826720}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -73,7 +73,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b5d635da7f195ef4f8030207c5439fc6, type: 2}
+  - {fileID: 2100000, guid: 9382645f1ae07a649acd35b1bdf53f16, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -97,13 +97,13 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &8801000480988376781
+--- !u!136 &2384255399202144893
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2831840330880355044}
+  m_GameObject: {fileID: 5160984221567826720}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -120,26 +120,26 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7507980568933211391
+--- !u!114 &5714812089412718588
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2831840330880355044}
+  m_GameObject: {fileID: 5160984221567826720}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ebe1d3b579e987478563d60404f0b7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 100
---- !u!114 &465232333264661650
+  maxHealth: 300
+--- !u!114 &3896646673404351636
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2831840330880355044}
+  m_GameObject: {fileID: 5160984221567826720}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
@@ -153,17 +153,17 @@ MonoBehaviour:
   m_IgnoreFromBuild: 1
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffff
---- !u!195 &9202119039673708271
+--- !u!195 &4087931135387411761
 NavMeshAgent:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2831840330880355044}
+  m_GameObject: {fileID: 5160984221567826720}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 3
+  m_Radius: 0.6
+  m_Speed: 1.5
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -172,47 +172,47 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 2
-  m_BaseOffset: 1
+  m_BaseOffset: 1.6
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &6663807122022670052
+--- !u!114 &6692991105664447759
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2831840330880355044}
+  m_GameObject: {fileID: 5160984221567826720}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0eacb3e2e93154746865c2df6d6d73d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
   target: {fileID: 0}
-  attackRange: 2
-  attackCooldown: 1
+  attackRange: 2.8
+  attackCooldown: 1.5
   keepDistance: 0
   repathInterval: 0.2
   knockbackDuration: 0.08
---- !u!114 &730487076016756067
+--- !u!114 &8673272156260448773
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2831840330880355044}
+  m_GameObject: {fileID: 5160984221567826720}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bde86c263e56b3e47bda1f7c7a7b144f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MeleeAttack
-  damage: 10
---- !u!114 &5585052212129938348
+  damage: 25
+--- !u!114 &1528317225319506113
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2831840330880355044}
+  m_GameObject: {fileID: 5160984221567826720}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11128e412c7175945bf6ac1d4767069f, type: 3}

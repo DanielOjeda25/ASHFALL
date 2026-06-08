@@ -14,6 +14,9 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
     [Header("Ataque")]
     public float attackRange = 2f;     // a que distancia puede atacar
     public float attackCooldown = 1f;  // segundos entre ataques (el EFECTO lo hace EnemyAttack)
+    // KITING (enemigos a distancia): si > 0, mantiene esta distancia del objetivo
+    // (se aleja si esta mas cerca, se acerca si esta mas lejos). 0 = perseguir siempre (melee).
+    public float keepDistance = 0f;
 
     [Header("Rendimiento")]
     // Recalcular la ruta cada frame por enemigo no escala a hordas. Lo hacemos
@@ -57,6 +60,10 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
 
         // Velocidad escalada por la dificultad de la oleada actual.
         if (agent != null) agent.speed = baseSpeed * Difficulty.speedMultiplier;
+
+        // Enemigos a distancia: la rotacion la llevamos nosotros (mirar al jugador), no
+        // el agente (que miraria a su destino de movimiento).
+        if (agent != null && keepDistance > 0f) agent.updateRotation = false;
     }
 
     // IKnockbackable: el arma/explosion nos empuja al impactar.
@@ -92,7 +99,7 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
         if (repathTimer <= 0f)
         {
             repathTimer = repathInterval;
-            agent.SetDestination(target.position);
+            UpdateDestination();
         }
 
         // En rango + sin cooldown -> delegamos el efecto a la estrategia de ataque.
@@ -103,6 +110,31 @@ public class EnemyAI : MonoBehaviour, IKnockbackable
             lastAttackTime = Time.time;
             attack?.Execute(target);
         }
+
+        // Enemigos a distancia: mirar al jugador (para que el arma apunte de frente).
+        if (keepDistance > 0f)
+        {
+            Vector3 flat = toTarget; flat.y = 0f;
+            if (flat.sqrMagnitude > 0.01f)
+                transform.rotation = Quaternion.RotateTowards(transform.rotation,
+                    Quaternion.LookRotation(flat), 360f * Time.deltaTime);
+        }
+    }
+
+    // Decide a donde ir. Por defecto persigue. Con keepDistance > 0 hace KITING:
+    // retrocede si esta muy cerca, se acerca si esta lejos, se planta en la banda.
+    void UpdateDestination()
+    {
+        if (keepDistance <= 0f) { agent.SetDestination(target.position); return; }
+
+        Vector3 flat = target.position - transform.position; flat.y = 0f;
+        float dist = flat.magnitude;
+        if (dist < keepDistance * 0.85f && dist > 0.01f)
+            agent.SetDestination(transform.position - flat.normalized * 3f);  // retrocede
+        else if (dist > keepDistance * 1.15f)
+            agent.SetDestination(target.position);                            // se acerca
+        else
+            agent.SetDestination(transform.position);                         // se planta y dispara
     }
 }
 }
