@@ -54,6 +54,10 @@ public class CameraShake : MonoBehaviour
 
     void LateUpdate()
     {
+        // En pausa / fin de partida (timeScale 0) MouseLook no reescribe la rotacion;
+        // si siguieramos aplicando el shake, se acumularia cada frame y la camara giraria.
+        if (Time.timeScale == 0f) return;
+
         if (trauma <= 0f) return;
         trauma = Mathf.Max(0f, trauma - decay * Time.deltaTime);
 
