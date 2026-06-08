@@ -185,8 +185,8 @@ public class Weapon : MonoBehaviour
 
         // Algo por delante para no chocar con el propio jugador al nacer.
         Vector3 spawn = origin + direction * 1.2f;
-        GameObject p = Instantiate(data.projectilePrefab, spawn, Quaternion.LookRotation(direction));
-        if (p.TryGetComponent(out Projectile proj))
+        GameObject p = PoolManager.Spawn(data.projectilePrefab, spawn, Quaternion.LookRotation(direction));
+        if (p != null && p.TryGetComponent(out Projectile proj))
             proj.Launch(direction * data.projectileSpeed, data.damage, data.minDamage, data.explosionRadius, data.knockback, hitMask);
     }
 

@@ -19,6 +19,7 @@ public class KamikazeAttack : EnemyAttack
     public float knockback = 6f;
     public LayerMask hitMask = ~0;
     public GameObject explosionPrefab;   // VFX + sonido reutilizable (Explosion)
+    public float explosionLifetime = 2f; // segundos antes de reciclar el VFX
 
     private EnemyHealth self;
     private bool hasExploded;
@@ -76,7 +77,7 @@ public class KamikazeAttack : EnemyAttack
         }
 
         if (explosionPrefab != null)
-            Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            PoolManager.SpawnTimed(explosionPrefab, transform.position, Quaternion.identity, explosionLifetime);
     }
 }
 }

@@ -27,7 +27,8 @@ public class EnemyProjectile : MonoBehaviour
         rb.useGravity = false;
         GetComponent<Collider>().isTrigger = true;
 
-        Destroy(gameObject, maxLifetime);
+        CancelInvoke();
+        Invoke(nameof(Expire), maxLifetime);   // failsafe: vuelve al pool si no choca
     }
 
     void Update()
@@ -48,7 +49,7 @@ public class EnemyProjectile : MonoBehaviour
         {
             consumed = true;
             dmgable.TakeDamage(damage);
-            Destroy(gameObject);
+            Despawn();
             return;
         }
 
@@ -56,8 +57,17 @@ public class EnemyProjectile : MonoBehaviour
         if (!other.isTrigger)
         {
             consumed = true;
-            Destroy(gameObject);
+            Despawn();
         }
+    }
+
+    void Expire() => Despawn();
+
+    // Vuelve al pool (o se destruye si no vino de un pool / no hay PoolManager).
+    void Despawn()
+    {
+        CancelInvoke();
+        PoolManager.Return(gameObject);
     }
 }
 }

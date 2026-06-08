@@ -28,7 +28,8 @@ public class RangedAttack : EnemyAttack
         Vector3 dir = (aim - origin).normalized;
         if (muzzlePoint == null) origin += dir * muzzleForward;
 
-        var go = Instantiate(projectilePrefab, origin, Quaternion.LookRotation(dir));
+        var go = PoolManager.Spawn(projectilePrefab, origin, Quaternion.LookRotation(dir));
+        if (go == null) return;
         var proj = go.GetComponent<EnemyProjectile>();
         if (proj != null) proj.Launch(dir * projectileSpeed, damage);
     }

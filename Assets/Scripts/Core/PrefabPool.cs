@@ -23,11 +23,15 @@ public class PrefabPool
     // Da un objeto listo en (pos, rot): reutiliza uno inactivo o crea uno nuevo.
     public GameObject Get(Vector3 pos, Quaternion rot)
     {
-        GameObject go;
+        GameObject go = null;
 
-        if (idle.Count > 0)
-        {
+        // Descarta de la cola instancias destruidas por fuera (p. ej. un AutoDestroy en
+        // el prefab): asi el pool nunca devuelve un objeto muerto y no se rompe.
+        while (idle.Count > 0 && go == null)
             go = idle.Dequeue();
+
+        if (go != null)
+        {
             go.transform.SetParent(parent, false);
             go.transform.SetPositionAndRotation(pos, rot);
             go.SetActive(true);
