@@ -145,8 +145,10 @@ public class CrosshairArcs : VisualElement
     // Arcos rojos que apuntan al origen del dano reciente y se desvanecen.
     void DrawDamage(Painter2D p, Vector2 c)
     {
-        const float r = 54f, half = 22f;
-        p.lineWidth = 6f;
+        // Radio amplio: hacia los laterales/bordes, NO pegado a la mira. Grande y grueso.
+        float r = Mathf.Min(contentRect.width, contentRect.height) * 0.30f;
+        const float half = 26f;
+        p.lineWidth = 14f;
         for (int i = 0; i < MaxDamage; i++)
         {
             if (dmgLife[i] <= 0f) continue;

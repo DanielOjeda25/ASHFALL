@@ -21,6 +21,7 @@ public class HudController : MonoBehaviour
 
     private Label healthValue, ammoValue, weaponName, waveValue;
     private CrosshairArcs crosshair;   // arcos del reticle (vida/escudo/cargador/reserva)
+    private DamageVignette vignette;   // bordes rojos al recibir dano / vida baja
     private Camera cam;                // para calcular la direccion del dano (cacheada)
 
     void OnEnable()
@@ -54,6 +55,7 @@ public class HudController : MonoBehaviour
             if (to.sqrMagnitude > 0.0001f && fwd.sqrMagnitude > 0.0001f)
                 crosshair.AddDamage(Vector3.SignedAngle(fwd, to, Vector3.up));  // 0=frente, +=derecha
         }
+        if (vignette != null) vignette.Pulse();   // borde rojo al recibir dano
         CameraShake.Add(playerHitShake);
     }
 
@@ -72,7 +74,11 @@ public class HudController : MonoBehaviour
         weaponName = root.Q<Label>("weapon-name");
         waveValue = root.Q<Label>("wave-value");
 
-        // Reticle con arcos: lo creamos por codigo y lo anadimos como overlay.
+        // Vineta de dano: overlay DETRAS del texto del HUD (Insert(0)).
+        vignette = new DamageVignette();
+        root.Insert(0, vignette);
+
+        // Reticle con arcos: lo creamos por codigo y lo anadimos como overlay (encima).
         crosshair = new CrosshairArcs();
         root.Add(crosshair);
         crosshair.Shield = 1f;    // placeholder hasta que exista el sistema de escudo
@@ -95,6 +101,8 @@ public class HudController : MonoBehaviour
 
         if (healthValue != null) healthValue.text = cur.ToString();
         if (crosshair != null) crosshair.Health = pct;   // arco de vida del reticle
+        // Tinte rojo persistente: empieza por debajo del 50% de vida, maximo al borde de morir.
+        if (vignette != null) vignette.LowHealth = 1f - Mathf.Clamp01(pct / 0.5f);
     }
 
     void RefreshAmmo()
