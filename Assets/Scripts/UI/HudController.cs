@@ -97,10 +97,7 @@ public class HudController : MonoBehaviour
     {
         // La stamina y las cargas de dash cambian continuamente -> se refrescan cada frame.
         if (crosshair != null && playerMovement != null)
-        {
-            crosshair.Shield = playerMovement.Stamina01;
-            crosshair.SetDash(playerMovement.DashCharges, playerMovement.MaxDashCharges);
-        }
+            crosshair.Shield = playerMovement.Stamina01;   // arco sup-izq = stamina (sprint+dash)
         // La mira se abre segun la dispersion actual del arma (preciso parado, abierto al moverse).
         if (crosshair != null && weapon != null)
             crosshair.Bloom = weapon.CurrentSpread * 2.5f;

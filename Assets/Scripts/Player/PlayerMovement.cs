@@ -21,15 +21,14 @@ public class PlayerMovement : MonoBehaviour
     public float coyoteTime = 0.12f;  // margen para saltar tras salir de un borde
     public float jumpBuffer = 0.12f;  // margen para registrar el salto justo antes de aterrizar
 
-    [Header("Dash / esquiva (cargas, estilo Doom)")]
+    [Header("Dash / esquiva")]
     public float dashSpeed = 22f;       // velocidad del impulso
     public float dashDuration = 0.18f;  // cuanto dura el impulso
-    public int maxDashCharges = 2;      // dashes seguidos disponibles
-    public float dashRecharge = 2f;     // segundos para recuperar 1 carga
 
-    [Header("Stamina del sprint")]
+    [Header("Stamina (la comparten sprint y dash)")]
     public float maxStamina = 100f;
     public float sprintDrain = 34f;        // mas alto: el sprint dura menos
+    public float dashCost = 35f;           // gasto por dash (se raciona con el sprint)
     public float staminaRegen = 28f;       // recuperacion por segundo
     public float staminaRegenDelay = 0.7f; // respiro tras el ultimo uso antes de regenerar
 
@@ -48,7 +47,6 @@ public class PlayerMovement : MonoBehaviour
     private float jumpBufferTimer;    // cuenta atras del jump buffer
     private bool wasGrounded;         // para detectar el frame de aterrizaje
     private float dashTimer;          // tiempo restante del dash en curso
-    private float dashCharges;        // 0..maxDashCharges (recarga continua)
     private Vector3 dashDir;          // direccion del dash actual
     private float stamina;
     private float lastStaminaUse;
@@ -56,8 +54,6 @@ public class PlayerMovement : MonoBehaviour
 
     public bool IsDashing => dashTimer > 0f;
     public float Stamina01 => maxStamina > 0f ? stamina / maxStamina : 0f;
-    public float DashCharges => dashCharges;   // incluye la fraccion de la carga en recarga
-    public int MaxDashCharges => maxDashCharges;
 
     // Se dispara al aterrizar; el float es la velocidad de caida (para el dip de camara).
     public event System.Action<float> Landed;
@@ -76,7 +72,6 @@ public class PlayerMovement : MonoBehaviour
         standHeight = controller.height;       // tomamos la altura actual como "de pie"
         standCenterY = controller.center.y;
         stamina = maxStamina;
-        dashCharges = maxDashCharges;
     }
 
     void Update()
@@ -139,18 +134,16 @@ public class PlayerMovement : MonoBehaviour
 
         verticalVelocity += gravity * Time.deltaTime;
 
-        // --- Dash / esquiva (Alt izq): cargas estilo Doom (cada dash gasta 1, se recargan) ---
-        if (dashCharges < maxDashCharges) dashCharges += Time.deltaTime / dashRecharge;
-        dashCharges = Mathf.Min(dashCharges, maxDashCharges);
-
-        if (kb != null && kb.leftAltKey.wasPressedThisFrame && dashCharges >= 1f && !isCrouching)
+        // --- Dash / esquiva (Alt izq): gasta stamina (se raciona con el sprint) ---
+        if (kb != null && kb.leftAltKey.wasPressedThisFrame && !isCrouching && stamina >= dashCost)
         {
             // Hacia donde te mueves; si estas quieto, hacia donde miras.
             dashDir = move.sqrMagnitude > 0.01f ? move.normalized : transform.forward;
             dashDir.y = 0f;
             dashDir = dashDir.normalized;
             dashTimer = dashDuration;
-            dashCharges -= 1f;   // gasta una carga
+            stamina -= dashCost;          // el dash bebe de la misma stamina que el sprint
+            lastStaminaUse = Time.time;
         }
 
         // Durante el dash, la horizontal se sustituye por el impulso (ignora walk/sprint).
