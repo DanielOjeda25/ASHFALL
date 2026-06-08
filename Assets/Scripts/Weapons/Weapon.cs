@@ -32,6 +32,23 @@ public class Weapon : MonoBehaviour
     // El HUD lee esto; lo exponemos desde los datos para no tener que cambiar su codigo.
     public int magazineSize => data != null ? data.magazineSize : 0;
 
+    private PlayerMovement movement;  // para la dispersion segun el movimiento
+
+    // Dispersion actual (grados) segun el estado del jugador: parado preciso, moverse
+    // penaliza. La lee el disparo y el HUD (para abrir la mira).
+    public float CurrentSpread
+    {
+        get
+        {
+            if (data == null) return 0f;
+            if (movement == null) return data.spread;
+            if (movement.IsDashing || !movement.IsGrounded) return data.spread + data.airSpread;
+            if (movement.IsSprinting) return data.spread + data.sprintSpread;
+            if (movement.IsMoving) return data.spread + data.moveSpread;
+            return data.spread;
+        }
+    }
+
     // Eventos para los componentes de efectos (patron observador).
     public event Action Fired;                  // disparo efectivo (gasta bala)
     public event Action DryFired;               // clic sin municion
@@ -47,6 +64,8 @@ public class Weapon : MonoBehaviour
 
         if (data == null)
             Debug.LogError("Weapon: falta asignar un WeaponData en 'data'.", this);
+
+        movement = GetComponentInParent<PlayerMovement>();  // sube por Camera/WeaponHolder hasta el Player
     }
 
     void Start()
@@ -115,23 +134,25 @@ public class Weapon : MonoBehaviour
 
         Vector3 origin = fpsCamera.transform.position;
         Vector3 forward = fpsCamera.transform.forward;
+        float spread = CurrentSpread;   // dispersion por movimiento (0 si estas quieto)
 
         // La FORMA de disparar la decide el WeaponData (un arma nueva = otra ficha).
         switch (data.fireType)
         {
             case FireType.Shotgun:
-                // Perdigones x canones (doble canon = el doble de plomo).
+                // Perdigones x canones (doble canon = el doble de plomo). El cono base del
+                // arma + la dispersion por movimiento.
                 for (int i = 0; i < data.pellets * barrels; i++)
-                    FireRay(origin, SpreadDirection(forward, data.spreadAngle));
+                    FireRay(origin, SpreadDirection(forward, data.spreadAngle + spread));
                 break;
 
             case FireType.Projectile:
-                // Lanza un proyectil que explota (dano en area) al impactar.
-                FireProjectile(origin, forward);
+                // Lanza un proyectil; el movimiento afecta menos a un cohete (mitad).
+                FireProjectile(origin, SpreadDirection(forward, spread * 0.5f));
                 break;
 
-            default: // Single: un raycast recto (pistola/rifle).
-                FireRay(origin, forward);
+            default: // Single: un raycast con la dispersion actual (preciso si estas quieto).
+                FireRay(origin, SpreadDirection(forward, spread));
                 break;
         }
     }

@@ -28,6 +28,13 @@ public class CrosshairArcs : VisualElement
     private float circleRadius = 9f;
     public float CircleRadius { set { circleRadius = Mathf.Max(2f, value); MarkDirtyRepaint(); } }
 
+    // Apertura extra de la mira (px) por la dispersion dinamica del arma al moverse.
+    private float bloom;
+    public float Bloom
+    {
+        set { float v = Mathf.Max(0f, value); if (Mathf.Abs(v - bloom) > 0.1f) { bloom = v; MarkDirtyRepaint(); } }
+    }
+
     // Lo llama el HUD en cada disparo: los arcos se "abren" y vuelven solos.
     public void Kick() { kick = 1f; MarkDirtyRepaint(); }
 
@@ -215,7 +222,7 @@ public class CrosshairArcs : VisualElement
         p.strokeColor = Bone;
         p.fillColor = Bone;
 
-        float e = kick * ReticleKick;   // expansion por disparo (decae sola, como los arcos)
+        float e = kick * ReticleKick + bloom;   // apertura: disparo (decae) + dispersion por movimiento
 
         switch (reticle)
         {

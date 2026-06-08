@@ -101,6 +101,9 @@ public class HudController : MonoBehaviour
             crosshair.Shield = playerMovement.Stamina01;
             crosshair.SetDash(playerMovement.DashCharges, playerMovement.MaxDashCharges);
         }
+        // La mira se abre segun la dispersion actual del arma (preciso parado, abierto al moverse).
+        if (crosshair != null && weapon != null)
+            crosshair.Bloom = weapon.CurrentSpread * 2.5f;
     }
 
     void OnHealthChanged(int current, int max) => RefreshHealth();

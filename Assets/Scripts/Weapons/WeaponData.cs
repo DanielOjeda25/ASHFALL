@@ -38,6 +38,12 @@ public class WeaponData : ScriptableObject
     [Header("Disparo")]
     public float range = 100f;        // alcance del rayo en metros
 
+    [Header("Precision (dispersion dinamica por movimiento)")]
+    public float spread = 0.4f;        // grados parado (casi perfecto)
+    public float moveSpread = 1.8f;    // extra andando
+    public float sprintSpread = 3f;    // extra esprintando
+    public float airSpread = 4.5f;     // extra en el aire o dasheando
+
     [Header("Dano (con caida por distancia)")]
     public int damage = 25;           // dano a quemarropa (hasta falloffStart)
     public int minDamage = 8;         // dano minimo (desde falloffEnd en adelante)
