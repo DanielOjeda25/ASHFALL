@@ -38,6 +38,7 @@ public class CrosshairArcs : VisualElement
     const float AnimSpeed = 8f;
     const float LowThreshold = 0.3f;
     const float KickExpand = 9f;     // px que se abren los arcos al disparar
+    const float ReticleKick = 7f;    // px que se abre la mira central al disparar
     const float SpinSpeed = 7f;      // grados por tick del spinner de recarga
 
     // Si la descarga sale al reves, cambia esto a false.
@@ -178,24 +179,26 @@ public class CrosshairArcs : VisualElement
         p.strokeColor = Bone;
         p.fillColor = Bone;
 
+        float e = kick * ReticleKick;   // expansion por disparo (decae sola, como los arcos)
+
         switch (reticle)
         {
             case CrosshairStyle.Dot:
                 p.BeginPath();
-                p.Arc(c, 2.5f, Deg(0), Deg(360));
+                p.Arc(c, 2.5f + e * 0.4f, Deg(0), Deg(360));   // leve pulso
                 p.Fill();
                 break;
 
             case CrosshairStyle.Circle:
                 p.lineWidth = 2f;
                 p.BeginPath();
-                p.Arc(c, circleRadius, Deg(0), Deg(360));
+                p.Arc(c, circleRadius + e, Deg(0), Deg(360));  // el circulo crece al disparar
                 p.Stroke();
                 break;
 
             default: // Cross: cuatro marcas con hueco central
                 p.lineWidth = 2f;
-                float g = 4f, len = 7f;
+                float g = 4f + e, len = 7f;   // el hueco central se abre al disparar
                 Line(p, new Vector2(c.x, c.y - g), new Vector2(c.x, c.y - g - len));
                 Line(p, new Vector2(c.x, c.y + g), new Vector2(c.x, c.y + g + len));
                 Line(p, new Vector2(c.x - g, c.y), new Vector2(c.x - g - len, c.y));
