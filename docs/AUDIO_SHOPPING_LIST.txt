@@ -1,0 +1,94 @@
+================================================================
+ASHFALL - LISTA DE SONIDOS A CONSEGUIR (checklist)
+================================================================
+Formato: .wav, MONO para SFX. Loops de ambiente/musica pueden ser ESTEREO.
+Donde hay numeros (1..3) = variantes para que no suene repetitivo.
+Fuentes gratis: Freesound, Sonniss GDC (CC0), Mixkit, Kenney (UI).
+  -> Verificar licencia CC0 o atribucion.
+Marca con [x] lo que ya guardaste.
+
+----------------------------------------------------------------
+PRIORIDAD ALTA (lo que mas se nota)
+----------------------------------------------------------------
+[ ] dash1.wav                 whoosh corto y seco (esquiva/dash)
+                              -> Assets/Audio/Player/
+[ ] player_hurt1.wav          gruñido/dolor humano al recibir daño
+[ ] player_hurt2.wav
+[ ] player_hurt3.wav
+                              -> Assets/Audio/Player/
+[ ] player_death1.wav         grito/estertor de muerte del jugador
+                              -> Assets/Audio/Player/
+[ ] enemy_death1.wav          muerte de criatura (gutural/monstruo)
+[ ] enemy_death2.wav
+[ ] enemy_death3.wav
+                              -> Assets/Audio/Enemies/
+[ ] melee_attack1.wav         zarpazo/golpe corporal (swing)
+[ ] melee_attack2.wav
+[ ] melee_attack3.wav
+                              -> Assets/Audio/Enemies/
+[ ] explosion1.wav            explosion grave con cola (bazooka + kamikaze)
+[ ] explosion2.wav
+                              -> Assets/Audio/Explosions/
+
+----------------------------------------------------------------
+PRIORIDAD MEDIA
+----------------------------------------------------------------
+[ ] jump1.wav                 esfuerzo corto / roce al saltar
+[ ] land1.wav                 aterrizaje con peso (botas)
+                              -> Assets/Audio/Player/
+[ ] enemy_alert1.wav          gruñido de deteccion (te ve)
+[ ] enemy_alert2.wav
+                              -> Assets/Audio/Enemies/
+[ ] ranged_fire1.wav          disparo/escupitajo de proyectil enemigo
+[ ] ranged_fire2.wav
+                              -> Assets/Audio/Enemies/
+[ ] enemy_proj_impact1.wav    impacto del proyectil enemigo
+                              -> Assets/Audio/Enemies/
+[ ] kamikaze_fuse1.wav        silbido/mecha que sube de tono
+                              -> Assets/Audio/Enemies/
+[ ] bz_reload1.wav            cargar cohete en el tubo (mecanico)
+                              -> Assets/Audio/Weapons/Bazooka/
+[ ] hitmarker1.wav            "tick" corto de confirmacion de impacto
+                              -> Assets/Audio/Weapons/Shared/
+[ ] wave_start1.wav           aviso/stinger "horda entrante"
+[ ] wave_clear1.wav           jingle corto de oleada superada
+[ ] victory1.wav              stinger de victoria
+[ ] defeat1.wav               stinger de derrota/game over
+                              -> Assets/Audio/Game/
+
+----------------------------------------------------------------
+PULIDO (baja)
+----------------------------------------------------------------
+[ ] crouch_down1.wav          roce de tela al agacharse
+[ ] crouch_up1.wav            roce de tela al levantarse
+[ ] no_stamina1.wav           jadeo / "sin aire" al quedarte sin barra
+                              -> Assets/Audio/Player/
+[ ] tank_step1.wav            pisada pesada (enemigo tanque)
+[ ] tank_attack1.wav          golpe fuerte / aplastar
+                              -> Assets/Audio/Enemies/
+[ ] bz_empty1.wav             clic sin municion (bazooka)
+                              -> Assets/Audio/Weapons/Bazooka/
+[ ] ui_click1.wav             clic de boton de menu
+[ ] ui_hover1.wav             hover suave de boton
+                              -> Assets/Audio/UI/
+[ ] ash_step1.wav             pasos sobre ceniza/grava (mundo ASHFALL)
+[ ] ash_step2.wav
+[ ] ash_step3.wav
+[ ] ash_step4.wav
+                              -> Assets/Audio/Footsteps/
+
+----------------------------------------------------------------
+AMBIENTE / MUSICA (ESTEREO, loopable)
+----------------------------------------------------------------
+[ ] amb_wind_loop1.wav        viento desolado / drone con ceniza (loop)
+[ ] music_combat_loop1.wav    musica de combate intensa (loop)
+                              -> Assets/Audio/Ambience/
+
+----------------------------------------------------------------
+NOTAS
+----------------------------------------------------------------
+- Con solo los de PRIORIDAD ALTA ya se nota un salto grande de feel.
+- Si viene en .mp3/.ogg igual sirve; Unity lo importa (o lo paso a .wav).
+- No hace falta crear las carpetas a mano: se pueden crear al guardar,
+  o las creo yo al programar los enganches.
+- Detalle completo y enganches de codigo: ver docs/AUDIO_TODO.md
