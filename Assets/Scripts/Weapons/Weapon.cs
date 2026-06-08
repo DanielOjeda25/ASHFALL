@@ -139,7 +139,9 @@ public class Weapon : MonoBehaviour
     // Un raycast: aplica dano (con falloff) a lo golpeado y emite el evento Hit.
     void FireRay(Vector3 origin, Vector3 direction)
     {
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, data.range, hitMask))
+        // Ignora triggers (p. ej. los proyectiles enemigos): no queremos que la bala
+        // "impacte" contra ellos. Enemigos y mundo usan colliders solidos.
+        if (Physics.Raycast(origin, direction, out RaycastHit hit, data.range, hitMask, QueryTriggerInteraction.Ignore))
         {
             IDamageable damageable = hit.collider.GetComponent<IDamageable>();
             if (damageable != null)

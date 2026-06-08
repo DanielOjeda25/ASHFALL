@@ -53,6 +53,7 @@ public abstract class Health : MonoBehaviour, IDamageable
         if (isDead) return; // ya muerto: ignora golpes extra
 
         currentHealth -= amount;
+        if (currentHealth < 0) currentHealth = 0;   // nunca mostrar vida negativa
         Damaged?.Invoke(currentHealth, maxHealth);
 
         if (currentHealth <= 0)
