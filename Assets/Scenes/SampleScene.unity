@@ -885,11 +885,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: ef0ac3d3bcf76a544b8c489cef241612, type: 3}
   - {fileID: 8300000, guid: 087f7341d522c1a4c92a5d39bd4232b1, type: 3}
   dashClips:
-  - {fileID: 8300000, guid: f6ac60d83c992834e813d08353e0e899, type: 3}
-  - {fileID: 8300000, guid: bcfc33e51c2d9d7429b55d75255dda22, type: 3}
+  - {fileID: 8300000, guid: 63503bd4e3269b54a8116fbefce263fc, type: 3}
   noStaminaClips:
-  - {fileID: 8300000, guid: 693f0571f99c1a54c9bfb23a14c7d06e, type: 3}
-  - {fileID: 8300000, guid: 7a510633ae765c443a8b2d7645e94364, type: 3}
+  - {fileID: 8300000, guid: 99e46f7c78450ef4084353418e2a323e, type: 3}
   volume: 1
 --- !u!114 &924380271
 MonoBehaviour:

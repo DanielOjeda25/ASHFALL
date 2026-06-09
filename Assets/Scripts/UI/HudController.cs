@@ -103,11 +103,10 @@ public class HudController : MonoBehaviour
         vignette = new DamageVignette();
         root.Insert(0, vignette);
 
-        // Reticle con arcos: creamos el objeto (para que los setters null-safe funcionen)
-        // pero NO lo añadimos al HUD: usamos la mira animada del pack y los arcos cruzaban.
-        // (la vida se ve en la caja SALUD; la stamina tendra su propio indicador mas adelante)
+        // Overlay de feedback de combate (dano direccional + X de hitmarker). Los ARCOS
+        // ya no se dibujan (la mira/municion las pone el pack; la vida, la caja SALUD).
         crosshair = new CrosshairArcs();
-        // root.Add(crosshair);   // (desactivado) -> mira del pack en el centro
+        root.Add(crosshair);
         // El arco superior-izquierdo (antes "escudo") muestra la STAMINA (sprint/dash).
         playerMovement = playerHealth != null ? playerHealth.GetComponent<PlayerMovement>() : null;
         crosshair.Shield = playerMovement != null ? playerMovement.Stamina01 : 1f;

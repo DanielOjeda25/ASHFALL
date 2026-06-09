@@ -148,19 +148,9 @@ public class CrosshairArcs : VisualElement
         Vector2 c = contentRect.center;
         p.lineCap = LineCap.Round;
 
-        if (reloading)
-        {
-            DrawSpinner(p, c);   // recargando: circulo girando en lugar de los arcos
-        }
-        else
-        {
-            DrawStat(p, c, InnerRadius, 180f, dHealth);  // vida
-            DrawStat(p, c, OuterRadius, 180f, dShield);  // escudo
-            DrawStat(p, c, InnerRadius, 0f, dMag);       // cargador
-            DrawStat(p, c, OuterRadius, 0f, dReserve);   // reserva
-        }
-
-        // DrawReticle(p, c);   // (desactivado) usamos la mira animada del pack en el centro
+        // Arcos (vida/escudo/cargador) y reticle DESACTIVADOS: la mira animada y la
+        // municion las pone el pack; la vida vive en la caja SALUD. Este overlay solo
+        // dibuja el feedback de combate: dano direccional + hitmarker.
         DrawDamage(p, c);     // indicadores direccionales de dano (si los hay)
         DrawHitmarker(p, c);  // X breve al confirmar impacto en enemigo
     }
