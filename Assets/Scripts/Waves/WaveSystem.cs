@@ -16,6 +16,11 @@ namespace ShooterDem
 //               totalWaves = N -> finitas, victoria al limpiar la oleada N.
 public class WaveSystem : MonoBehaviour
 {
+    [Header("Desarrollo")]
+    [Tooltip("OFF = NO aparecen enemigos (util mientras se ajustan otras cosas). " +
+             "Se puede togglear en el Inspector.")]
+    public bool spawnEnemies = true;      // flag global de hordas on/off
+
     [Header("Oleadas")]
     public int totalWaves = 0;            // 0 = infinitas; N = finitas con victoria
     public int baseEnemies = 5;           // enemigos en la oleada 1
@@ -61,6 +66,11 @@ public class WaveSystem : MonoBehaviour
 
     void Start()
     {
+        if (!spawnEnemies)
+        {
+            Debug.Log("WaveSystem: spawnEnemies = false -> hordas DESACTIVADAS (modo desarrollo).");
+            return;
+        }
         if (spawner == null)
         {
             Debug.LogError("WaveSystem: falta asignar el EnemySpawner.");
