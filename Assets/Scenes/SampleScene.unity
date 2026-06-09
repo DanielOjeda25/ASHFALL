@@ -805,6 +805,14 @@ MonoBehaviour:
   gravity: -9.81
   coyoteTime: 0.12
   jumpBuffer: 0.12
+  dashSpeed: 22
+  dashDuration: 0.18
+  dashClip: {fileID: 0}
+  maxStamina: 100
+  sprintDrain: 34
+  dashCost: 35
+  staminaRegen: 28
+  staminaRegenDelay: 0.7
   crouchHeight: 1.3
   crouchTransitionSpeed: 10
 --- !u!143 &597900054
@@ -892,6 +900,8 @@ MonoBehaviour:
   bobAmpX: 0.03
   landingDipScale: 0.04
   maxLandingDip: 0.18
+  dashFovPunch: 12
+  fovLerpSpeed: 9
 --- !u!114 &597900058
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6084,7 +6094,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1180645020}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
@@ -6624,7 +6634,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2100669873}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
@@ -6690,6 +6700,7 @@ MonoBehaviour:
   waveSystem: {fileID: 1902528918}
   weaponManager: {fileID: 1482782269}
   playerHitShake: 0.35
+  hitmarkerClip: {fileID: 0}
 --- !u!114 &2122434681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6697,7 +6708,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2122434679}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 

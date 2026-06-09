@@ -155,3 +155,45 @@ detalle y los **pasos pendientes** en el pilar *"Personajes y animaciones (model
 Después: **spawners por zonas** → **mapa-arena grande** (el gran salto restante).
 Pendientes menores: clip real de sonido de explosión, props destructibles, más armas, **decals de
 bala por superficie** (sistema propio del autor, a futuro).
+
+---
+
+## 🔀 DECISIÓN (2026-06-08) — Camino A: adoptar el framework del *Low Poly Shooter Pack*
+
+> **Contexto:** importamos el **Low Poly Shooter Pack – Free Sample** (InfimaGames) para el
+> **viewmodel FPS** (brazos + armas + animaciones). Intentamos el *Camino C* (solo su arte +
+> puente a nuestro `Weapon`), pero el cableado del viewmodel resultó **muy tedioso** (el origen
+> del rig, la pose Idle, el controller dependiente de sus scripts, etc.). Tras evaluar opciones,
+> se decide el **Camino A**.
+
+**Camino A = ASHFALL (URP) sigue siendo la base + adoptamos la LÓGICA del pack para
+jugador/arma/viewmodel.** Archivamos nuestros scripts de jugador/arma (no se borran) y usamos su
+sistema, que ya trae el viewmodel y las armas funcionando.
+
+**Por qué A y no las otras:**
+- **No el "Camino B"** (abrir el proyecto del pack y traer lo nuestro): su proyecto es **Built-in**,
+  y todo nuestro **VFX/gore/decals es URP** → saldría roto y habría que rehacerlo. Pérdida enorme.
+- Lo más caro de ASHFALL (**enemigos/hordas/gore/oleadas en URP**) **se conserva intacto**.
+
+**Qué CONSERVAMOS:** enemigos (4 tipos + IA/aggro + `EnemyAudio`), oleadas, gore/decals, VFX URP,
+GameManager, proyecto + git. **Qué ARCHIVAMOS** (a `Assets/_Archive/`): `PlayerMovement`,
+`WeaponManager`, `Weapon`, `MouseLook`, recoil, footsteps nuestros. El **dash/stamina** se re-pega
+sobre el movimiento del pack más adelante.
+
+**Pasos para MAÑANA (orden):**
+1. **Commit de seguridad** de ASHFALL como está (antes del cambio grande).
+2. **Archivar** nuestros scripts de jugador/arma a `Assets/_Archive/` (fuera de compilación).
+3. **Importar el `Code/`** del pack + su **player prefab** `P_LPSP_FP_CH`; **convertir sus
+   materiales a URP** (ya sabemos cómo: Standard/Autodesk Interactive → URP/Lit).
+4. **Puentes** (lo único nuevo a escribir):
+   - su arma (raycast) → daña a **nuestros enemigos** vía `IDamageable`/`Health`.
+   - nuestros enemigos (`EnemyAI`/ataques) → dañan a **su jugador** (su Health).
+   - HUD: usar el suyo al inicio; re-enganchar **oleadas** después.
+5. Probar: **jugador del pack** (viewmodel + armas que funcionan) **vs nuestras hordas**.
+
+**Bonus a aprovechar del pack:** **barriles explosivos + props destructibles** (cumple el pendiente
+"props destructibles") y sus **VFX** (muzzle flash, impactos, casquillos).
+
+**Estado al cerrar hoy:** arte del pack importado en `Assets/ThirdParty/LowPolyShooterPack/`
+(materiales convertidos a URP); experimento de viewmodel **revertido** (escena limpia, enemigos ON).
+Decisión tomada: **Camino A**. Mañana se ejecuta desde el paso 1.
