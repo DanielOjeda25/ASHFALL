@@ -332,6 +332,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   automatic: 1
   projectileImpulse: 400
+  ashfallBulletDamage: 25
   roundsPerMinutes: 610
   mask:
     serializedVersion: 2

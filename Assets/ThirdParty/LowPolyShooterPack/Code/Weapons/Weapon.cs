@@ -21,6 +21,10 @@ namespace InfimaGames.LowPolyShooterPack
         [SerializeField]
         private float projectileImpulse = 400.0f;
 
+        [Tooltip("ASHFALL: dano que aplica el balin de esta arma (pistola vs rifle).")]
+        [SerializeField]
+        private int ashfallBulletDamage = 25;
+
         [Tooltip("Amount of shots this weapon can shoot in a minute. It determines how fast the weapon shoots.")]
         [SerializeField] 
         private int roundsPerMinutes = 200;
@@ -234,7 +238,11 @@ namespace InfimaGames.LowPolyShooterPack
             //Spawn projectile from the projectile spawn point.
             GameObject projectile = Instantiate(prefabProjectile, muzzleSocket.position, rotation);
             //Add velocity to the projectile.
-            projectile.GetComponent<Rigidbody>().linearVelocity = projectile.transform.forward * projectileImpulse;   
+            projectile.GetComponent<Rigidbody>().linearVelocity = projectile.transform.forward * projectileImpulse;
+
+            //ASHFALL: dano por arma -> al balin spawneado (asi pistola y rifle pegan distinto).
+            var ashfallDamage = projectile.GetComponent<ShooterDem.LpspBulletDamage>();
+            if (ashfallDamage != null) ashfallDamage.damage = ashfallBulletDamage;
         }
 
         public override void FillAmmunition(int amount)
