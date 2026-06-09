@@ -164,6 +164,21 @@ public class HudController : MonoBehaviour
         }
     }
 
+    // Munición desde una fuente EXTERNA (arma del Low Poly Shooter Pack), via LpspHudAmmo.
+    // Nuestro `Weapon` quedó solo para el viejo arsenal; el player del pack usa su propia arma.
+    public void SetAmmoExternal(int current, int magazine)
+    {
+        if (ammoValue != null) ammoValue.text = $"{current} / {magazine}";
+        if (crosshair != null)
+            crosshair.Magazine = magazine > 0 ? Mathf.Clamp01((float)current / magazine) : 0f;
+    }
+
+    // Nombre del arma desde fuente externa (arma del pack).
+    public void SetWeaponNameExternal(string name)
+    {
+        if (weaponName != null) weaponName.text = name;
+    }
+
     void OnWaveChanged(int wave) => RefreshWave();
 
     void RefreshWave()
