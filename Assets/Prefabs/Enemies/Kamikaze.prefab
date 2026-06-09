@@ -345,8 +345,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.EnemyAudio
   idleLoop: {fileID: 8300000, guid: 22d73b3deefb44d409847151defc0705, type: 3}
   alertClips:
-  - {fileID: 8300000, guid: 452abcf17175c4b459060a6745074893, type: 3}
-  - {fileID: 8300000, guid: f5d1c6023c976ea4daeb57cc2fa88554, type: 3}
+  - {fileID: 8300000, guid: 0142299cd64c79b4b9bf5cf9f778c9cb, type: 3}
   attackClips: []
   hurtClips:
   - {fileID: 8300000, guid: 4d747778a6f3542419e82a86cf8b663b, type: 3}
@@ -354,3 +353,5 @@ MonoBehaviour:
   deathClips: []
   deathSfxPrefab: {fileID: 0}
   deathVolume: 1
+  loopAlert: 1
+  pitchJitter: 0.1
