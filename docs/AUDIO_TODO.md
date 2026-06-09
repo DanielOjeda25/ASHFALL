@@ -56,13 +56,15 @@
 
 | Sonido | Dónde engancha | Prioridad |
 |---|---|---|
-| Proyectil del ranged: vuelo + impacto | `EnemyProjectile.cs` (sin audio) | 🟡 |
-| Inicio de oleada / oleada superada | `WaveSystem` (eventos ya existen) | 🟡 |
-| Victoria / derrota (stinger de fin) | `GameManager.TriggerVictory/Lose` | 🟡 |
 | Stinger de transición de música | `MusicManager.stingerClip` (solo falta el clip) | 🎵⚪ |
 | Agacharse / levantarse | `Movement` del pack | ⚪ |
 | Pasos por superficie (ceniza/metal) | sistema de pasos | ⚪ |
 | Ambiente de fondo (viento/ceniza) además de la música | loop 2D aparte | ⚪ |
+
+> **Decisiones del autor (jun 2026):** el audio del **ranged** queda cubierto con
+> `ranged.wav` (variante de disparo) — sin sonido extra de proyectil. **No habrá** jingles
+> de inicio/fin de oleada ni de victoria/derrota: la música adaptativa ya comunica el
+> estado del combate.
 
 ### ⏸️ En pausa (Camino A archivó el arsenal propio)
 Recarga/empty/silbido de **bazooka** y variantes de escopeta — vuelven cuando se

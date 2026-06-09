@@ -221,4 +221,5 @@ Sistema de audio completo; el detalle vive en `docs/AUDIO_TODO.md`. Resumen:
 
 **Siguiente (orden sugerido):** 🎯 **modelos 3D animados para ENEMIGOS** (las cápsulas siguen;
 el lado jugador lo resolvió el pack) → **spawners por zonas** → **mapa-arena grande**.
-Audio menor pendiente: proyectil del ranged, jingles de oleada/victoria/derrota, stinger.
+Audio: decisión del autor — **sin** jingles de oleada/victoria/derrota (la música adaptativa
+ya comunica el combate); ranged cubierto. Solo queda pulido opcional (stinger, crouch, ambiente).
