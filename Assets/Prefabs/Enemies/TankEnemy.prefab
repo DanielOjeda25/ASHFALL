@@ -336,7 +336,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.EnemyAudio
   idleLoop: {fileID: 0}
-  alertClips: []
+  alertClips:
+  - {fileID: 8300000, guid: 467954bacc264d8489ecddc6a506c03a, type: 3}
+  - {fileID: 8300000, guid: ddb52ff5d5434b546a8e3772581b8174, type: 3}
+  - {fileID: 8300000, guid: 99d08143acd09bf42a73dd5fd6e51e4b, type: 3}
   attackClips: []
   hurtClips:
   - {fileID: 8300000, guid: 4d747778a6f3542419e82a86cf8b663b, type: 3}
@@ -345,3 +348,11 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 098f96e66a21d8c42a035e135be5facb, type: 3}
   deathSfxPrefab: {fileID: 313156952767155808, guid: bd33a1ca0e214aa4eb82310cc1823721, type: 3}
   deathVolume: 1
+  loopAlert: 0
+  pitchJitter: 0
+  stepClips:
+  - {fileID: 8300000, guid: 69c4a522e9b860848a95b01d50e42a1f, type: 3}
+  - {fileID: 8300000, guid: 9d3925c3a86d9294b812344d4f0aa3f0, type: 3}
+  - {fileID: 8300000, guid: b7c2e64dbfef3b84497097974903c59a, type: 3}
+  stepInterval: 0.7
+  stepMinSpeed: 0.4

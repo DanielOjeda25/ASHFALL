@@ -28,15 +28,36 @@ public class EnemyAudio : MonoBehaviour
     public float pitchJitter = 0f;    // +-tono aleatorio por enemigo: evita que varios suenen
                                       // clonados/sincronizados y desincroniza sus loops
 
+    [Header("Pasos (opcional, p.ej. tanque pesado)")]
+    public AudioClip[] stepClips;     // pasos al moverse (vacio = sin pasos)
+    public float stepInterval = 0.6f; // segundos entre pasos
+    public float stepMinSpeed = 0.4f; // velocidad minima del NavMeshAgent para "caminar"
+
     private AudioSource source;
     private EnemyAI ai;
     private Health health;
+    private UnityEngine.AI.NavMeshAgent agent;  // para los pasos por movimiento
+    private float stepTimer;
 
     void Awake()
     {
         source = GetComponent<AudioSource>();
         ai = GetComponent<EnemyAI>();
         health = GetComponent<Health>();
+        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+    }
+
+    // Pasos por movimiento (p.ej. el tanque): un paso cada stepInterval mientras el agente se mueve.
+    void Update()
+    {
+        if (Time.timeScale <= 0f) return;   // congelado (pausa/game over): sin pasos
+        if (stepClips == null || stepClips.Length == 0 || agent == null) return;
+        if (agent.velocity.sqrMagnitude > stepMinSpeed * stepMinSpeed)
+        {
+            stepTimer -= Time.deltaTime;
+            if (stepTimer <= 0f) { PlayRandom(stepClips); stepTimer = stepInterval; }
+        }
+        else stepTimer = 0f;   // al frenar, queda listo para sonar al primer paso siguiente
     }
 
     // OnEnable/OnDisable (no Awake): asi tambien suscribe/reinicia al RECICLAR del pool.
