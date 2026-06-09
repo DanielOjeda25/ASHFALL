@@ -85,7 +85,11 @@ namespace InfimaGames.LowPolyShooterPack
         private bool grounded;
 
         // Salto (ASHFALL): se encola al presionar y se consume en FixedUpdate.
+        // La cola CADUCA (jump buffer): sin esto, un Espacio presionado en el aire quedaba
+        // armado para siempre y el salto+sonido disparaban al ATERRIZAR.
         private bool jumpQueued;
+        private float jumpQueuedTimer;
+        private const float JumpBufferTime = 0.15f;   // ventana para "pulsar un pelin antes"
         private InputAction jumpAction;
 
         // Stamina / Dash (ASHFALL).
@@ -212,7 +216,16 @@ namespace InfimaGames.LowPolyShooterPack
 
             //Salto (ASHFALL): detectar el press aqui; se aplica en FixedUpdate.
             if (jumpAction != null && jumpAction.WasPressedThisFrame())
+            {
                 jumpQueued = true;
+                jumpQueuedTimer = JumpBufferTime;
+            }
+            //La cola caduca si no se consume a tiempo (evita el salto fantasma al aterrizar).
+            if (jumpQueued)
+            {
+                jumpQueuedTimer -= Time.deltaTime;
+                if (jumpQueuedTimer <= 0f) jumpQueued = false;
+            }
 
             //Dash (ASHFALL): Alt izquierdo, si hay stamina y no esta dasheando ya.
             var kb = Keyboard.current;

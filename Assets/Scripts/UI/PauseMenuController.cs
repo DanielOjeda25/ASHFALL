@@ -34,6 +34,13 @@ public class PauseMenuController : MonoBehaviour
         if (diffMedium != null) diffMedium.clicked += () => SetDifficulty(DifficultyLevel.Medium);
         if (diffHard != null) diffHard.clicked += () => SetDifficulty(DifficultyLevel.Hard);
 
+        // Sonidos de UI: clic + hover en TODOS los botones del menu (Query los recorre).
+        root.Query<Button>().ForEach(b =>
+        {
+            b.clicked += UiAudio.PlayClick;
+            b.RegisterCallback<MouseEnterEvent>(_ => UiAudio.PlayHover());
+        });
+
         ShowMain();   // empieza en el menu principal (oculta opciones)
         Hide();       // oculto del todo hasta pausar
     }

@@ -436,6 +436,7 @@ MonoBehaviour:
   alertClips: []
   attackClips:
   - {fileID: 8300000, guid: dce4391f46ebb6f48b894009d74e918c, type: 3}
+  - {fileID: 8300000, guid: 6c20c105bd94a414f908cbb3d982a57d, type: 3}
   hurtClips:
   - {fileID: 8300000, guid: 4d747778a6f3542419e82a86cf8b663b, type: 3}
   - {fileID: 8300000, guid: 638550862da624e4cafc606da5b82753, type: 3}
@@ -443,6 +444,11 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 098f96e66a21d8c42a035e135be5facb, type: 3}
   deathSfxPrefab: {fileID: 313156952767155808, guid: bd33a1ca0e214aa4eb82310cc1823721, type: 3}
   deathVolume: 1
+  loopAlert: 0
+  pitchJitter: 0
+  stepClips: []
+  stepInterval: 0.6
+  stepMinSpeed: 0.4
 --- !u!1 &7812347240536052565
 GameObject:
   m_ObjectHideFlags: 0

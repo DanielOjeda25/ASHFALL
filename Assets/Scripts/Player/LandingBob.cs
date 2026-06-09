@@ -21,6 +21,10 @@ namespace ShooterDem
         [Tooltip("Amortiguación (más alto = menos rebote).")]
         public float damping = 14f;
 
+        // Bus estatico: "el player aterrizo" (0..1 = fuerza del impacto). Lo escucha
+        // PlayerAudio para el sonido de caida, sin cableado en el Inspector.
+        public static event System.Action<float> Landed;
+
         private Rigidbody body;
         private Vector3 baseLocalPos;
         private float offset, velocity, prevYVel;
@@ -41,6 +45,7 @@ namespace ShooterDem
                 float impact = Mathf.InverseLerp(minImpactSpeed, maxImpactSpeed, -prevYVel);
                 offset = -maxDip * impact;   // la cámara baja de golpe
                 velocity = 0f;
+                Landed?.Invoke(impact);      // avisa (sonido de caida, etc.)
             }
             prevYVel = yv;
 

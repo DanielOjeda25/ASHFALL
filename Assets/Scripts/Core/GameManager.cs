@@ -91,6 +91,9 @@ public class GameManager : MonoBehaviour
     {
         isPaused = true;
         Time.timeScale = 0f;
+        // Interruptor maestro de audio: pausa TODO (musica, SFX en vuelo, loops de
+        // enemigos). Los sonidos de menu sobreviven porque UiAudio usa ignoreListenerPause.
+        AudioListener.pause = true;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
@@ -102,6 +105,7 @@ public class GameManager : MonoBehaviour
     {
         isPaused = false;
         Time.timeScale = 1f;                       // el juego vuelve a correr
+        AudioListener.pause = false;               // el audio retoma justo donde quedo
         Cursor.lockState = CursorLockMode.Locked;  // re-enganchamos el cursor (FPS)
         Cursor.visible = false;
 
@@ -114,6 +118,7 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         Time.timeScale = 1f; // IMPORTANTE: restaurar antes de recargar, si no la escena nueva nace congelada
+        AudioListener.pause = false; // idem: es estatico, si reinicias desde la pausa naceria MUDA
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 

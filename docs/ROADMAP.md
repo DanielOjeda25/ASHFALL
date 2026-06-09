@@ -194,6 +194,31 @@ sobre el movimiento del pack más adelante.
 **Bonus a aprovechar del pack:** **barriles explosivos + props destructibles** (cumple el pendiente
 "props destructibles") y sus **VFX** (muzzle flash, impactos, casquillos).
 
-**Estado al cerrar hoy:** arte del pack importado en `Assets/ThirdParty/LowPolyShooterPack/`
-(materiales convertidos a URP); experimento de viewmodel **revertido** (escena limpia, enemigos ON).
-Decisión tomada: **Camino A**. Mañana se ejecuta desde el paso 1.
+**✅ EJECUTADO (jun 2026).** El Camino A se completó: player del pack (`Player_LPSP`, viewmodel
+con brazos+armas reales) integrado con **salto/dash/stamina re-pegados** sobre su `Movement`
+(+ jump buffer), puente de daño `LpspBulletDamage` (balas del pack → nuestros enemigos, con
+gore), barriles explosivos funcionando, HUD híbrido (mira/munición del pack + caja SALUD +
+overlay propio de daño direccional y hitmarker). FOV corregido a 70 (el pack traía 90 vertical
+≈ 121 horizontal). Scripts propios archivados según lo planeado.
+
+---
+
+## 🔊 Sección AUDIO — ✅ CERRADA (jun 2026)
+
+Sistema de audio completo; el detalle vive en `docs/AUDIO_TODO.md`. Resumen:
+- **Jugador** (`PlayerAudio`, voces grabadas por el autor): daño (anti-eco), muerte, salto,
+  aterrizaje (por fuerza), dash, sin-stamina, latido a vida baja. Fuente 2D propia (lección:
+  compartir fuente con los pasos del pack silenciaba la muerte al congelar el juego).
+- **Enemigos** (`EnemyAudio` 3D en los 4 tipos): idle/alerta (aggro), ataque, daño, muerte
+  vía **`PooledSfx`** (audio que sobrevive al reciclaje del pool). Kamikaze con explosión propia.
+- **Detección/aggro** (`EnemyAI.detectionRange` + evento `Aggroed`): enemigos dormidos hasta
+  que el jugador se acerca — base de la activación por zonas del mapa grande.
+- **Hitmarker** (X + tic, bus `HitConfirmed`), **UI** (`UiAudio`: click/hover/esc) y
+  **pausa real de audio** (`AudioListener.pause` como interruptor maestro).
+- **🎵 Música adaptativa estilo Serious Sam** (`MusicManager`): 2 capas en loop permanente
+  (peace/fight generadas con IA, frase firma compartida, E frigia dominante) + crossfade por
+  enemigos vivos + histéresis. `firstWaveDelay = 10s` de calma inicial.
+
+**Siguiente (orden sugerido):** 🎯 **modelos 3D animados para ENEMIGOS** (las cápsulas siguen;
+el lado jugador lo resolvió el pack) → **spawners por zonas** → **mapa-arena grande**.
+Audio menor pendiente: proyectil del ranged, jingles de oleada/victoria/derrota, stinger.

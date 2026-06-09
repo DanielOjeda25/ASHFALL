@@ -30,6 +30,13 @@ public class GameOverController : MonoBehaviour
         Bind("btn-restart", () => GameManager.Instance?.RestartGame());
         Bind("btn-quit", () => GameManager.Instance?.QuitGame());
 
+        // Sonidos de UI: clic + hover en los botones de esta pantalla.
+        root.Query<Button>().ForEach(b =>
+        {
+            b.clicked += UiAudio.PlayClick;
+            b.RegisterCallback<MouseEnterEvent>(_ => UiAudio.PlayHover());
+        });
+
         Hide();   // oculto al empezar; aparece al terminar la partida
     }
 

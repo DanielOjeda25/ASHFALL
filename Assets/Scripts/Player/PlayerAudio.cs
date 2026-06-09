@@ -21,10 +21,23 @@ namespace ShooterDem
         public AudioClip[] jumpClips;       // al saltar
         public AudioClip[] dashClips;       // al dashear (Alt)
         public AudioClip[] noStaminaClips;  // al intentar dashear sin stamina
+        public AudioClip[] landClips;       // al aterrizar (volumen segun el golpe)
+
+        [Header("Vida baja")]
+        public AudioClip heartbeatLoop;            // latido en bucle con poca vida
+        [Range(0f, 1f)] public float heartbeatThreshold = 0.3f;   // % de vida que lo activa
+        [Range(0f, 1f)] public float heartbeatVolume = 0.8f;
 
         [Range(0f, 1f)] public float volume = 1f;
 
+        // Anti-eco del quejido: con 2+ enemigos golpeando casi a la vez, cada golpe
+        // disparaba su PlayOneShot y las voces se encimaban como eco. Cooldown corto:
+        // una sola voz por "tanda" de golpes (el dano se aplica igual; solo es la voz).
+        const float HurtVoiceCooldown = 0.35f;
+        private float lastHurtTime;
+
         private AudioSource source;
+        private AudioSource heartbeatSource;   // fuente propia: es un LOOP, no puede compartir
         private PlayerHealth health;
         private Movement movement;   // player del pack (puede no estar -> null-safe)
 
@@ -32,10 +45,20 @@ namespace ShooterDem
         {
             health = GetComponent<PlayerHealth>();
             movement = GetComponent<Movement>();
-            source = GetComponent<AudioSource>();
-            if (source == null) source = gameObject.AddComponent<AudioSource>();
+            // SIEMPRE fuente propia (no GetComponent): el AudioSource que ya vive en el
+            // player es el de los PASOS del pack, y Movement lo PAUSA con timeScale 0
+            // (pausa/game over). Compartirlo silenciaba el grito de muerte: el Lose()
+            // congela el tiempo justo despues de Died y el Pause() cortaba el PlayOneShot.
+            source = gameObject.AddComponent<AudioSource>();
             source.playOnAwake = false;
             source.spatialBlend = 0f;   // 2D: feedback del jugador
+
+            // El latido necesita su PROPIA fuente: es un loop (Play/Stop), y la principal
+            // se usa con PlayOneShot; compartirla cortaria el loop con cada efecto.
+            heartbeatSource = gameObject.AddComponent<AudioSource>();
+            heartbeatSource.playOnAwake = false;
+            heartbeatSource.spatialBlend = 0f;
+            heartbeatSource.loop = true;
         }
 
         void OnEnable()
@@ -51,6 +74,7 @@ namespace ShooterDem
                 movement.Dashed += OnDash;
                 movement.StaminaDenied += OnNoStamina;
             }
+            LandingBob.Landed += OnLand;   // bus estatico (la camara detecta el aterrizaje)
         }
 
         void OnDisable()
@@ -66,15 +90,53 @@ namespace ShooterDem
                 movement.Dashed -= OnDash;
                 movement.StaminaDenied -= OnNoStamina;
             }
+            LandingBob.Landed -= OnLand;
+            if (heartbeatSource != null) heartbeatSource.Stop();
         }
 
-        // Quejido SOLO en golpe no letal (en el letal suena el grito de muerte).
+        // Quejido SOLO en golpe no letal (en el letal suena el grito de muerte),
+        // y como mucho una voz cada HurtVoiceCooldown (anti-eco con varios enemigos).
         void OnDamaged(int current, int max)
         {
-            if (current > 0) PlayRandom(hurtClips);
+            UpdateHeartbeat(current, max);
+
+            if (current <= 0) return;
+            if (Time.time < lastHurtTime + HurtVoiceCooldown) return;
+            lastHurtTime = Time.time;
+            PlayRandom(hurtClips);
         }
 
-        void OnDied() => PlayRandom(deathClips);
+        // Latido: arranca al caer del umbral de vida y para al morir (no hay curacion aun;
+        // si algun dia existe, este mismo check lo apaga al subir de vida).
+        void UpdateHeartbeat(int current, int max)
+        {
+            if (heartbeatSource == null || heartbeatLoop == null) return;
+            bool low = current > 0 && max > 0 && (float)current / max <= heartbeatThreshold;
+            if (low && !heartbeatSource.isPlaying)
+            {
+                heartbeatSource.clip = heartbeatLoop;
+                heartbeatSource.volume = heartbeatVolume;
+                heartbeatSource.Play();
+            }
+            else if (!low && heartbeatSource.isPlaying)
+            {
+                heartbeatSource.Stop();
+            }
+        }
+
+        void OnDied()
+        {
+            if (heartbeatSource != null) heartbeatSource.Stop();   // muerto: corta el latido
+            PlayRandom(deathClips);
+        }
+
+        // Aterrizaje: volumen segun la fuerza del golpe (caida corta = suave, larga = fuerte).
+        void OnLand(float impact)
+        {
+            if (landClips == null || landClips.Length == 0) return;
+            var clip = landClips[Random.Range(0, landClips.Length)];
+            if (clip != null) source.PlayOneShot(clip, volume * Mathf.Lerp(0.4f, 1f, impact));
+        }
 
         void OnJump() => PlayRandom(jumpClips);
         void OnDash() => PlayRandom(dashClips);

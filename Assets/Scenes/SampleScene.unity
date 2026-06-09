@@ -585,6 +585,57 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ba67efa6dcab9a54aac7e607f17f759c, type: 3}
+--- !u!1 &534842487
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 534842489}
+  - component: {fileID: 534842488}
+  m_Layer: 0
+  m_Name: MusicManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &534842488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 534842487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d62079a850b10143b34aa20800ab545, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.MusicManager
+  peaceClip: {fileID: 8300000, guid: cb4a4ecf25f9eab4b95c8b0a2d249e7d, type: 3}
+  fightClip: {fileID: 8300000, guid: e1800392e9eaa3c42ae2d329f4be3bd0, type: 3}
+  stingerClip: {fileID: 0}
+  musicVolume: 0.6
+  crossfadeTime: 1.5
+  calmDelay: 3
+  stingerVolume: 0.9
+--- !u!4 &534842489
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 534842487}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &642308055
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -880,11 +931,16 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 9009ec4793312cf46bd61c3984941620, type: 3}
   - {fileID: 8300000, guid: 02ec2436d283aea45a210bc333d23de2, type: 3}
   jumpClips:
-  - {fileID: 8300000, guid: 7486aee8138b5b844a16352d84fe43d9, type: 3}
+  - {fileID: 8300000, guid: 0c42e91f9a42fea4e9450095dcb941d3, type: 3}
   dashClips:
   - {fileID: 8300000, guid: 63503bd4e3269b54a8116fbefce263fc, type: 3}
   noStaminaClips:
   - {fileID: 8300000, guid: 99e46f7c78450ef4084353418e2a323e, type: 3}
+  landClips:
+  - {fileID: 8300000, guid: 3524d9abe0768814bbc7457d7635dba4, type: 3}
+  heartbeatLoop: {fileID: 8300000, guid: 1a6bb6523c450a741b6d0563c3fac42f, type: 3}
+  heartbeatThreshold: 0.3
+  heartbeatVolume: 0.8
   volume: 1
 --- !u!114 &924380271
 MonoBehaviour:
@@ -906,6 +962,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 916095938892669238, guid: 19eadcf8fbed56b4da77ca94c1b4145f, type: 3}
+      propertyPath: field of view
+      value: 70
+      objectReference: {fileID: 0}
     - target: {fileID: 2748913124992463393, guid: 19eadcf8fbed56b4da77ca94c1b4145f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -988,6 +1048,7 @@ GameObject:
   - component: {fileID: 1180645023}
   - component: {fileID: 1180645022}
   - component: {fileID: 1180645021}
+  - component: {fileID: 1180645024}
   m_Layer: 0
   m_Name: PauseMenu_UITK
   m_TagString: Untagged
@@ -1045,6 +1106,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1180645024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180645020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b628e0832690a840abf99aef2390202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.UiAudio
+  clickClip: {fileID: 8300000, guid: 0c70ead5854918644aff51ed89604364, type: 3}
+  hoverClip: {fileID: 8300000, guid: f4e13dd9e72f18b4f91d57e124703392, type: 3}
+  escClip: {fileID: 8300000, guid: 9d553edd19bcddf4fb4d128af4c7536a, type: 3}
+  volume: 1
 --- !u!1 &1240245551
 GameObject:
   m_ObjectHideFlags: 0
@@ -1195,7 +1272,7 @@ MonoBehaviour:
   timeBetweenWaves: 3
   restReductionPerWave: 0.5
   minTimeBetweenWaves: 1.5
-  firstWaveDelay: 2
+  firstWaveDelay: 10
   healthGrowthPerWave: 0.15
   speedGrowthPerWave: 0.05
   maxSpeedMultiplier: 2
@@ -1523,3 +1600,4 @@ SceneRoots:
   - {fileID: 2068637133}
   - {fileID: 642308055}
   - {fileID: 2144439137}
+  - {fileID: 534842489}
