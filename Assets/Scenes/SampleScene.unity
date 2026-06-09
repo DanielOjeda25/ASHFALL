@@ -880,10 +880,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 9009ec4793312cf46bd61c3984941620, type: 3}
   - {fileID: 8300000, guid: 02ec2436d283aea45a210bc333d23de2, type: 3}
   jumpClips:
-  - {fileID: 8300000, guid: bba3d3e2eb1a504448ae28ccb14b0daf, type: 3}
-  - {fileID: 8300000, guid: 16ebdde249aaf744194de6fb1d993093, type: 3}
-  - {fileID: 8300000, guid: ef0ac3d3bcf76a544b8c489cef241612, type: 3}
-  - {fileID: 8300000, guid: 087f7341d522c1a4c92a5d39bd4232b1, type: 3}
+  - {fileID: 8300000, guid: 7486aee8138b5b844a16352d84fe43d9, type: 3}
   dashClips:
   - {fileID: 8300000, guid: 63503bd4e3269b54a8116fbefce263fc, type: 3}
   noStaminaClips:
