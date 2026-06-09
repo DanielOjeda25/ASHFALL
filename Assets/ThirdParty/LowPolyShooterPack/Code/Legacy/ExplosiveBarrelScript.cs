@@ -29,6 +29,12 @@ public class ExplosiveBarrelScript : MonoBehaviour {
 	public float explosionForce = 4000.0f;
 	//ASHFALL: dano de la explosion (cae con la distancia hasta 0 en el borde del radio)
 	public int explosionDamage = 80;
+	//ASHFALL: empuje hacia arriba (te lanza en alto -> "mini caida" al caer). Subilo para mas vuelo.
+	public float explosionUpwardsModifier = 0.5f;
+	//ASHFALL: knockback al JUGADOR (la fisica lo controla un instante -> vuelo + caida). Tuneable.
+	public float knockbackHorizontal = 8f;   // empuje hacia atras (m/s) a quemarropa
+	public float knockbackVertical = 6f;     // empuje hacia arriba (m/s) a quemarropa
+	public float knockbackDuration = 0.45f;  // segundos sin control (mientras vuela/cae)
 
 	private void Update () {
 		//Generate random time based on min and max time values
@@ -64,7 +70,7 @@ public class ExplosiveBarrelScript : MonoBehaviour {
 
 			//Add force to nearby rigidbodies
 			if (rb != null)
-				rb.AddExplosionForce (explosionForce * 50, explosionPos, explosionRadius);
+				rb.AddExplosionForce (explosionForce * 50, explosionPos, explosionRadius, explosionUpwardsModifier);
 
 			//ASHFALL: dano por explosion a enemigos Y jugador (ambos son IDamageable), con caida por distancia.
 			var ashfallDmg = hit.GetComponentInParent<ShooterDem.IDamageable>();
@@ -77,7 +83,20 @@ public class ExplosiveBarrelScript : MonoBehaviour {
 					ashfallDmg.TakeDamage(dealt);
 					//Si fue el jugador, registramos la direccion (indicador de dano + shake).
 					var ashfallPlayer = ashfallDmg as ShooterDem.PlayerHealth;
-					if (ashfallPlayer != null) ashfallPlayer.RegisterHit(explosionPos);
+					if (ashfallPlayer != null)
+					{
+						ashfallPlayer.RegisterHit(explosionPos);
+						//ASHFALL: knockback real -> el Movement cede el control a la fisica (vuelo + caida).
+						var ashfallMove = ashfallPlayer.GetComponent<InfimaGames.LowPolyShooterPack.Movement>();
+						if (ashfallMove != null)
+						{
+							Vector3 away = ashfallPlayer.transform.position - explosionPos;
+							away.y = 0f;
+							away = away.sqrMagnitude > 0.01f ? away.normalized : Vector3.zero;
+							float falloff = Mathf.Clamp01(1f - dist / explosionRadius);
+							ashfallMove.ApplyKnockback((away * knockbackHorizontal + Vector3.up * knockbackVertical) * falloff, knockbackDuration);
+						}
+					}
 				}
 			}
 

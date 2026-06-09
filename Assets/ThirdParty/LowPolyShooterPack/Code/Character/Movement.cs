@@ -94,6 +94,20 @@ namespace InfimaGames.LowPolyShooterPack
         private Vector3 dashDir;
         private ShooterDem.PlayerHealth playerHealth;   // para i-frames durante el dash
 
+        // Knockback (ASHFALL): mientras dura, MoveCharacter cede el control a la fisica.
+        private float knockbackTimer;
+
+        /// <summary>
+        /// ASHFALL: empuja al player con una velocidad dada y le quita el control del movimiento
+        /// por 'duration' segundos (para explosiones de barril -> vuelo + caida real).
+        /// </summary>
+        public void ApplyKnockback(Vector3 velocity, float duration)
+        {
+            if (rigidBody == null) rigidBody = GetComponent<Rigidbody>();
+            rigidBody.linearVelocity = velocity;
+            knockbackTimer = Mathf.Max(knockbackTimer, duration);
+        }
+
         /// <summary>
         /// Player Character.
         /// </summary>
@@ -237,6 +251,14 @@ namespace InfimaGames.LowPolyShooterPack
 
         private void MoveCharacter()
         {
+            //ASHFALL: durante el knockback (explosion) la FISICA manda -> no pisamos la velocidad,
+            //asi el empujon (arriba + atras) y la gravedad se sienten de verdad (vuelo + caida).
+            if (knockbackTimer > 0f)
+            {
+                knockbackTimer -= Time.fixedDeltaTime;
+                return;
+            }
+
             #region Calculate Movement Velocity
 
             //Get Movement Input!

@@ -161,3 +161,5 @@ MonoBehaviour:
   maxTime: 0.25
   explosionRadius: 3
   explosionForce: 5000
+  explosionDamage: 80
+  explosionUpwardsModifier: 0.5
