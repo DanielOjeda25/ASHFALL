@@ -22,6 +22,7 @@ public class HudController : MonoBehaviour
     [Header("Hitmarker")]
     public AudioClip hitmarkerClip;        // tic 2D al confirmar impacto en un enemigo
     private AudioSource hitAudio;          // fuente 2D (se crea sola en Start)
+    private bool hitmarkerArmed;           // un solo tic por disparo (la escopeta golpea N veces)
 
     private Label healthValue, ammoValue, weaponName, waveValue;
     private CrosshairArcs crosshair;   // arcos del reticle (vida/escudo/cargador/reserva)
@@ -69,14 +70,21 @@ public class HudController : MonoBehaviour
     void OnFired()
     {
         if (crosshair != null) crosshair.Kick();   // los arcos se "abren" al disparar
+        hitmarkerArmed = true;   // re-arma el tic: Fired ocurre ANTES que los Hit del disparo
     }
 
     // Disparo confirmado sobre un enemigo: X en la mira + tic 2D (feedback del jugador).
+    // La X visual puede repetirse sin coste; el SONIDO suena UNA vez por disparo (si no,
+    // la escopeta encimaria 8 tics y saturaria).
     void OnWeaponHit(RaycastHit hit, bool hitDamageable)
     {
         if (!hitDamageable) return;
         if (crosshair != null) crosshair.Hitmarker();
-        if (hitmarkerClip != null && hitAudio != null) hitAudio.PlayOneShot(hitmarkerClip);
+        if (hitmarkerArmed && hitmarkerClip != null && hitAudio != null)
+        {
+            hitAudio.PlayOneShot(hitmarkerClip);
+            hitmarkerArmed = false;   // ya sono para este disparo
+        }
     }
 
     void Start()
