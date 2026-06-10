@@ -33,6 +33,9 @@ namespace InfimaGames.LowPolyShooterPack
         private float jumpForce = 5.0f;
 
         [Header("Stamina / Dash (ASHFALL)")]
+        [Tooltip("Dash con Alt. DESACTIVADO por decision de diseno (daba demasiada ventaja); " +
+                 "el codigo queda por si se retoma a futuro.")]
+        [SerializeField] private bool dashEnabled = false;
         [SerializeField] private float staminaMax = 100f;
         [SerializeField] private float staminaRegenPerSecond = 25f;       // regen cuando NO esprintas
         [SerializeField] private float staminaSprintDrainPerSecond = 18f; // drena al esprintar
@@ -229,7 +232,7 @@ namespace InfimaGames.LowPolyShooterPack
 
             //Dash (ASHFALL): Alt izquierdo, si hay stamina y no esta dasheando ya.
             var kb = Keyboard.current;
-            if (dashTimer <= 0f && kb != null && kb.leftAltKey.wasPressedThisFrame)
+            if (dashEnabled && dashTimer <= 0f && kb != null && kb.leftAltKey.wasPressedThisFrame)
             {
                 if (stamina >= dashCost)
                 {

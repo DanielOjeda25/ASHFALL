@@ -25,9 +25,20 @@ namespace ShooterDem
         // PlayerAudio para el sonido de caida, sin cableado en el Inspector.
         public static event System.Action<float> Landed;
 
+        [Header("Bob al moverse (procedural — caminar/correr)")]
+        [Tooltip("Amplitud del bamboleo a velocidad de CORRER (m).")]
+        public float bobRunAmount = 0.035f;
+        [Tooltip("Zancadas por segundo a velocidad de correr.")]
+        public float bobRunFrequency = 2.6f;
+        [Tooltip("Velocidad (m/s) considerada 'correr a fondo' (escala amplitud y ritmo).")]
+        public float runSpeedReference = 6.8f;
+        [Tooltip("Vaiven lateral como fraccion del vertical.")]
+        [Range(0f, 1f)] public float swayFactor = 0.6f;
+
         private Rigidbody body;
         private Vector3 baseLocalPos;
         private float offset, velocity, prevYVel;
+        private float bobTimer, bobAmp;   // fase del paso + amplitud suavizada
 
         void Start()
         {
@@ -54,7 +65,28 @@ namespace ShooterDem
             velocity += accel * Time.deltaTime;
             offset += velocity * Time.deltaTime;
 
-            transform.localPosition = baseLocalPos + Vector3.up * offset;
+            // --- Bob de pasos (procedural): escala con la velocidad horizontal ---
+            // Caminar = suave y lento; correr = marcado y rapido. En el aire o quieto
+            // la amplitud decae a 0 (sin cortes secos).
+            Vector3 bob = Vector3.zero;
+            if (Time.timeScale > 0f)
+            {
+                Vector3 hv = body != null ? body.linearVelocity : Vector3.zero;
+                hv.y = 0f;
+                bool grounded = Mathf.Abs(yv) < 1.5f;   // sin bob en salto/caida
+                float intensity = grounded ? Mathf.Clamp01(hv.magnitude / runSpeedReference) : 0f;
+                bobAmp = Mathf.MoveTowards(bobAmp, intensity, Time.deltaTime * 3f);
+                if (bobAmp > 0.001f)
+                {
+                    bobTimer += Time.deltaTime * bobRunFrequency * Mathf.Max(0.4f, intensity) * Mathf.PI * 2f;
+                    float a = bobRunAmount * bobAmp;
+                    // vertical a doble frecuencia (cada pisada), lateral a simple (balanceo)
+                    bob = new Vector3(Mathf.Sin(bobTimer) * a * swayFactor,
+                                      -Mathf.Abs(Mathf.Sin(bobTimer)) * a, 0f);
+                }
+            }
+
+            transform.localPosition = baseLocalPos + Vector3.up * offset + bob;
         }
     }
 }

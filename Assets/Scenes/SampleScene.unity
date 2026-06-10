@@ -2712,6 +2712,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8321b3286952b54791c060b4dc29f40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.LpspHudAmmo
+--- !u!114 &924380283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924380248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7fb642c6c7fba448b16250af65c5688, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.UnarmedMode
+  unarmed: 1
 --- !u!1 &927565392
 GameObject:
   m_ObjectHideFlags: 0
@@ -3315,6 +3328,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e70b6a14872c8e74084c1ffb61c679dd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1027628055}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e70b6a14872c8e74084c1ffb61c679dd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1027628056}
   m_SourcePrefab: {fileID: 100100000, guid: e70b6a14872c8e74084c1ffb61c679dd, type: 3}
 --- !u!4 &1027628053 stripped
 Transform:
@@ -3348,6 +3364,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1027628056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027628054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82d4c8d31b38a374b9a123d3839e025e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.ViewmodelLocomotion
+  damping: 8
 --- !u!1 &1027856242
 GameObject:
   m_ObjectHideFlags: 0
@@ -3550,7 +3579,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8163229473432397683, guid: 19eadcf8fbed56b4da77ca94c1b4145f, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8887862365657776096, guid: 19eadcf8fbed56b4da77ca94c1b4145f, type: 3}
       propertyPath: m_Enabled
@@ -3574,6 +3603,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2751027687307977091, guid: 19eadcf8fbed56b4da77ca94c1b4145f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 924380271}
+    - targetCorrespondingSourceObject: {fileID: 2751027687307977091, guid: 19eadcf8fbed56b4da77ca94c1b4145f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 924380283}
     - targetCorrespondingSourceObject: {fileID: 56164245437412244, guid: 19eadcf8fbed56b4da77ca94c1b4145f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1620379816}
@@ -4859,6 +4891,10 @@ MonoBehaviour:
   maxImpactSpeed: 16
   spring: 140
   damping: 14
+  bobRunAmount: 0.035
+  bobRunFrequency: 2.6
+  runSpeedReference: 6.8
+  swayFactor: 0.6
 --- !u!1 &1634328446
 GameObject:
   m_ObjectHideFlags: 0
