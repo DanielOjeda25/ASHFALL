@@ -59,6 +59,8 @@ namespace InfimaGames.LowPolyShooterPack
         // Para el HUD (ASHFALL): stamina 0..1 y si esta dasheando.
         public float Stamina01 => staminaMax > 0f ? Mathf.Clamp01(stamina / staminaMax) : 0f;
         public bool IsDashing => dashTimer > 0f;
+        // Fuente unica de verdad del "estoy en el piso" (la usan bob de camara, stamina, salto).
+        public bool Grounded => grounded;
 
         // Eventos para el audio del jugador (ASHFALL): los escucha PlayerAudio.
         public event System.Action Jumped;
@@ -188,11 +190,14 @@ namespace InfimaGames.LowPolyShooterPack
             //Cast. This checks whether there is indeed ground, or not.
             Physics.SphereCastNonAlloc(bounds.center, radius, Vector3.down,
                 groundHits, extents.y - radius * 0.5f, ~0, QueryTriggerInteraction.Ignore);
-            
-            //We can ignore the rest if we don't have any proper hits.
-            if (!groundHits.Any(hit => hit.collider != null && hit.collider != capsule)) 
+
+            //ASHFALL: solo cuenta como piso una superficie HORIZONTAL (normal hacia arriba).
+            //El check original aceptaba CUALQUIER contacto: rozar una pared en el aire
+            //marcaba grounded=true (stamina drenando y bob "corriendo" en el aire).
+            if (!groundHits.Any(hit => hit.collider != null && hit.collider != capsule
+                                       && hit.normal.y > 0.6f))
                 return;
-            
+
             //Store RaycastHits.
             for (var i = 0; i < groundHits.Length; i++)
                 groundHits[i] = new RaycastHit();
@@ -264,8 +269,9 @@ namespace InfimaGames.LowPolyShooterPack
             if (dashTimer > 0f) dashTimer -= Time.deltaTime;
             if (playerHealth != null) playerHealth.Invulnerable = IsDashing;
 
-            //Stamina: drena al esprintar moviendose; regenera si no.
-            bool sprintingNow = playerCharacter.IsRunning() && !IsDashing
+            //Stamina: drena al esprintar moviendose EN EL PISO; regenera si no.
+            //(en el aire no se esprinta: ni drena stamina ni se siente "correr en el aire")
+            bool sprintingNow = playerCharacter.IsRunning() && !IsDashing && grounded
                                 && rigidBody.linearVelocity.sqrMagnitude > 0.1f;
             stamina += (sprintingNow ? -staminaSprintDrainPerSecond : staminaRegenPerSecond) * Time.deltaTime;
             stamina = Mathf.Clamp(stamina, 0f, staminaMax);

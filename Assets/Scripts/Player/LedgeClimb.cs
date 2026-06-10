@@ -53,8 +53,31 @@ namespace ShooterDem
         void Update()
         {
             if (climbing || Time.timeScale <= 0f) return;
+
+            // Manual: Espacio cerca de un borde alcanzable.
             if (jumpAction != null && jumpAction.WasPressedThisFrame())
+            {
                 TryClimb();
+                return;
+            }
+
+            // AUTO-AGARRE en el aire: saltaste hacia un muro alto -> engancha solo cuando
+            // el borde entra en rango (cerca del apex). Sin segundo boton.
+            if (!IsGrounded() && body.linearVelocity.y < 2f)
+            {
+                Vector3 hv = body.linearVelocity; hv.y = 0f;
+                Vector3 fwd = transform.forward; fwd.y = 0f;
+                // solo si te MOVES hacia donde miras (evita agarres accidentales de espaldas)
+                if (Vector3.Dot(hv, fwd.normalized) > 0.3f || hv.magnitude < 0.1f)
+                    TryClimb();
+            }
+        }
+
+        bool IsGrounded()
+        {
+            var b = capsule.bounds;
+            return Physics.Raycast(b.center, Vector3.down, b.extents.y + 0.1f,
+                                   climbMask & ~(1 << gameObject.layer), QueryTriggerInteraction.Ignore);
         }
 
         void TryClimb()
@@ -68,8 +91,14 @@ namespace ShooterDem
             if (!Physics.Raycast(chest, fwd, out var wall, maxGrabDistance + capsule.radius, mask, QueryTriggerInteraction.Ignore))
                 return;
 
+            // Direccion de TREPADO = perpendicular al muro (no hacia donde miras): el cuerpo
+            // sube derecho contra la pared y las manos quedan SOBRE el borde, no en diagonal.
+            Vector3 climbDir = -wall.normal; climbDir.y = 0f;
+            if (climbDir.sqrMagnitude < 0.01f) climbDir = fwd;
+            climbDir.Normalize();
+
             // 2) ¿hay TECHO plano encima de esa pared? (rayo hacia abajo, un poco metido)
-            Vector3 above = wall.point + fwd * 0.15f;
+            Vector3 above = wall.point + climbDir * 0.15f;
             above.y = feetY + maxLedgeHeight + 0.1f;
             if (!Physics.Raycast(above, Vector3.down, out var top, maxLedgeHeight + 0.1f, mask, QueryTriggerInteraction.Ignore))
                 return;
@@ -79,16 +108,19 @@ namespace ShooterDem
             if (h < minLedgeHeight || h > maxLedgeHeight) return;
 
             // 3) ¿hay LUGAR para pararse arriba? (cápsula fantasma en el destino)
-            Vector3 stand = top.point + fwd * 0.25f;
+            Vector3 stand = top.point + climbDir * 0.25f;
             Vector3 capBottom = stand + Vector3.up * (capsule.radius + 0.05f);
             Vector3 capTop = stand + Vector3.up * (capsule.height - capsule.radius + 0.05f);
             if (Physics.CheckCapsule(capBottom, capTop, capsule.radius * 0.9f, mask, QueryTriggerInteraction.Ignore))
                 return;
 
-            StartCoroutine(Climb(stand));
+            // punto de AGARRE: pegado al muro (el cuerpo se aprieta antes de subir)
+            Vector3 hang = wall.point - climbDir * (capsule.radius + 0.06f);
+            hang.y = transform.position.y;
+            StartCoroutine(Climb(hang, stand));
         }
 
-        IEnumerator Climb(Vector3 stand)
+        IEnumerator Climb(Vector3 hang, Vector3 stand)
         {
             climbing = true;
             movement.Suspended = true;
@@ -100,13 +132,21 @@ namespace ShooterDem
             float feetOffset = transform.position.y - capsule.bounds.min.y;
             Vector3 start = transform.position;
             Vector3 target = stand + Vector3.up * (feetOffset + 0.02f);
-            Vector3 mid = new Vector3(start.x, target.y + 0.05f, start.z);   // fase 1: subir
+            Vector3 mid = new Vector3(hang.x, target.y + 0.05f, hang.z);   // sube PEGADO al muro
 
-            float upDur = climbDuration * 0.55f, fwdDur = climbDuration * 0.45f, t = 0f;
-            while (t < upDur)
+            // fase 0 (8%): AGARRE — el cuerpo se aprieta contra el muro (vende el grab)
+            float grabDur = climbDuration * 0.15f, upDur = climbDuration * 0.50f, fwdDur = climbDuration * 0.35f, t = 0f;
+            while (t < grabDur)
             {
                 t += Time.deltaTime;
-                transform.position = Vector3.Lerp(start, mid, Smooth(t / upDur));
+                transform.position = Vector3.Lerp(start, hang, Smooth(t / grabDur));
+                yield return null;
+            }
+            t = 0f;
+            while (t < upDur)    // fase 1: subir en vertical, al ras de la pared
+            {
+                t += Time.deltaTime;
+                transform.position = Vector3.Lerp(hang, mid, Smooth(t / upDur));
                 yield return null;
             }
             t = 0f;

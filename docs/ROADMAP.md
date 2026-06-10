@@ -223,3 +223,37 @@ Sistema de audio completo; el detalle vive en `docs/AUDIO_TODO.md`. Resumen:
 el lado jugador lo resolvió el pack) → **spawners por zonas** → **mapa-arena grande**.
 Audio: decisión del autor — **sin** jingles de oleada/victoria/derrota (la música adaptativa
 ya comunica el combate); ranged cubierto. Solo queda pulido opcional (stinger, crouch, ambiente).
+
+---
+
+## 🎬 Sección ANIMACIONES PROPIAS + PARKOUR (jun 2026) — pipeline cerrado, debug pendiente
+
+**Pivote de viewmodel:** se descartó el viewmodel del pack para el largo plazo; el juego corre
+en **modo desarmado** (`UnarmedMode`: bloquea Fire/Aim/Reload por input; reversible) con
+**brazos propios** — rig **Hozq LVA4** (`BlenderWork/LVAA.blend`) + animaciones del autor.
+Setup de Blender MCP en `docs/BLENDER_MCP_SETUP.md`; quirks del pipeline en la memoria del agente.
+
+- **Animaciones del autor** (FBX `Assets/Characters/FPSArms/SK_FPSArms_LVA4.fbx`, 3 takes vía NLA):
+  - `Idle_Unarmed` (240f/10s): respiración + puños ocasionales (pose, cascada de dedos y
+    timing del autor; espejado L→R por script con flip de cuaterniones).
+  - `Run_Unarmed` (16f, ×1.45): brazos en contrafase que se cruzan, manos abiertas relajadas.
+  - `Climb_Unarmed` (14f): estirada → agarre (75% del puño del autor, palmas posadas) → tracción.
+- **Animator:** Blend Tree `Locomotion` por `Speed` real (0/4.3=idle, 6.8=run) + estado `Climb`
+  por trigger. `ViewmodelLocomotion` alimenta Speed; `LedgeClimb.ClimbStarted` dispara clim+sonido.
+- **Parkour (`LedgeClimb`):** Espacio cerca de un muro → mantle fluido (pegado→subir→entrar,
+  perpendicular al muro por su normal). **Auto-agarre en el aire** (saltar hacia muros altos).
+  Lenguaje de alturas: ≤2.4m trepable directo · 2.4–3.5 salto+agarre · >3.5 solo rampas.
+- **Game feel:** bob de cámara procedural espejo del Blend Tree (frecuencia constante = pisadas
+  de la anim 4.35/s; amplitud = peso del blend) + golpe de aterrizaje con recuperación
+  (`LandingBob`). **Dash DESACTIVADO** por diseño (`dashEnabled=false`; el código queda).
+
+**🐞 BUG ABIERTO (debug pendiente):** tras saltar desde plataformas (especialmente pegado a
+muros del trepado), el juego sigue creyendo que el player está en el piso: **stamina drena con
+Shift en el aire y el bob "corre" en el aire**. Ya intentado: grounded del pack filtrado por
+normal (`normal.y > 0.6`), bob unificado a `Movement.Grounded`, corte rápido de amplitud al
+despegar. **Persiste** → próxima sesión: instrumentar en vivo (loggear grounded/velocity/bobAmp
+por frame durante la secuencia exacta) en lugar de teorizar.
+
+**Siguiente:** debug del grounded → anim de **disparo** (AR_X montado en el rig de Hozq) →
+modelos de enemigos (concepto "El Calcinado" listo para Gemini) → **La Fundición Fase 1: el Atrio**
+(diseño completo en `docs/MAPA_FUNDICION.md`).

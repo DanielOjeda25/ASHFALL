@@ -14,12 +14,12 @@ namespace ShooterDem
         public float maxDip = 0.12f;
         [Tooltip("Velocidad de caída mínima para que se note el rebote.")]
         public float minImpactSpeed = 3f;
-        [Tooltip("Velocidad de caída para el rebote máximo.")]
-        public float maxImpactSpeed = 16f;
+        [Tooltip("Velocidad de caída para el rebote máximo (10 m/s ≈ caída de 5m).")]
+        public float maxImpactSpeed = 10f;
         [Tooltip("Rigidez del resorte (más alto = vuelve más rápido).")]
-        public float spring = 140f;
-        [Tooltip("Amortiguación (más alto = menos rebote).")]
-        public float damping = 14f;
+        public float spring = 90f;
+        [Tooltip("Amortiguación (más alto = menos rebote). Baja = se nota la 'recuperación'.")]
+        public float damping = 9f;
 
         // Bus estatico: "el player aterrizo" (0..1 = fuerza del impacto). Lo escucha
         // PlayerAudio para el sonido de caida, sin cableado en el Inspector.
@@ -39,13 +39,28 @@ namespace ShooterDem
         [Range(0f, 1f)] public float swayFactor = 0.6f;
 
         private Rigidbody body;
+        private CapsuleCollider bodyCapsule;   // fallback del chequeo de piso (raycast)
+        private InfimaGames.LowPolyShooterPack.Movement movement;   // fuente de verdad del grounded
         private Vector3 baseLocalPos;
         private float offset, velocity, prevYVel;
         private float bobTimer, bobAmp;   // fase del paso + amplitud suavizada
 
+        // MISMA fuente de verdad que stamina/salto: el grounded del Movement (que ya filtra
+        // paredes por normal). Fallback: raycast bajo la capsula si no hay Movement.
+        bool IsGrounded()
+        {
+            if (movement != null) return movement.Grounded;
+            if (bodyCapsule == null) return true;
+            var b = bodyCapsule.bounds;
+            return Physics.Raycast(b.center, Vector3.down, b.extents.y + 0.12f,
+                                   ~0, QueryTriggerInteraction.Ignore);
+        }
+
         void Start()
         {
             body = GetComponentInParent<Rigidbody>();
+            bodyCapsule = GetComponentInParent<CapsuleCollider>();
+            movement = GetComponentInParent<InfimaGames.LowPolyShooterPack.Movement>();
             baseLocalPos = transform.localPosition;
         }
 
@@ -78,9 +93,10 @@ namespace ShooterDem
             {
                 Vector3 hv = body != null ? body.linearVelocity : Vector3.zero;
                 hv.y = 0f;
-                bool grounded = Mathf.Abs(yv) < 1.5f;   // sin bob en salto/caida
+                bool grounded = IsGrounded();   // chequeo real: sin bob en salto/caida/apex
                 float runWeight = grounded ? Mathf.InverseLerp(blendStartSpeed, blendEndSpeed, hv.magnitude) : 0f;
-                bobAmp = Mathf.MoveTowards(bobAmp, runWeight, Time.deltaTime * 3f);
+                // entrada suave (3/s) pero corte RAPIDO al despegar (8/s): sin trote fantasma en el aire
+                bobAmp = Mathf.MoveTowards(bobAmp, runWeight, Time.deltaTime * (grounded ? 3f : 8f));
                 if (bobAmp > 0.001f)
                 {
                     // fase en pasos: |sin| tiene periodo PI -> una hundida por pisada
