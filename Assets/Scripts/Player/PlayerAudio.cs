@@ -136,8 +136,7 @@ namespace ShooterDem
         // Aterrizaje: volumen segun la fuerza del golpe (caida corta = suave, larga = fuerte).
         void OnLand(float impact)
         {
-            if (landClips == null || landClips.Length == 0) return;
-            var clip = landClips[Random.Range(0, landClips.Length)];
+            var clip = AudioUtil.PickRandom(landClips);
             if (clip != null) source.PlayOneShot(clip, volume * Mathf.Lerp(0.4f, 1f, impact));
         }
 
@@ -145,11 +144,6 @@ namespace ShooterDem
         void OnDash() => PlayRandom(dashClips);
         void OnNoStamina() => PlayRandom(noStaminaClips);
 
-        void PlayRandom(AudioClip[] clips)
-        {
-            if (clips == null || clips.Length == 0) return;
-            var clip = clips[Random.Range(0, clips.Length)];
-            if (clip != null) source.PlayOneShot(clip, volume);
-        }
+        void PlayRandom(AudioClip[] clips) => AudioUtil.PlayRandom(source, clips, volume);
     }
 }

@@ -18,7 +18,7 @@ namespace ShooterDem
 
         void Start()
         {
-            hud = FindFirstObjectByType<HudController>();
+            hud = FindAnyObjectByType<HudController>();
             TryGetCharacter();
         }
 

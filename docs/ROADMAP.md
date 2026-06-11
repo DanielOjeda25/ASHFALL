@@ -222,7 +222,31 @@ Sistema de audio completo; el detalle vive en `docs/AUDIO_TODO.md`. Resumen:
 **Siguiente (orden sugerido):** 🎯 **modelos 3D animados para ENEMIGOS** (las cápsulas siguen;
 el lado jugador lo resolvió el pack) → **spawners por zonas** → **mapa-arena grande**.
 Audio: decisión del autor — **sin** jingles de oleada/victoria/derrota (la música adaptativa
-ya comunica el combate); ranged cubierto. Solo queda pulido opcional (stinger, crouch, ambiente).
+ya comunica el combate); ranged cubierto. Solo queda pulido opcional (stinger, ambiente).
+
+---
+
+## 🧹 Salud del código — auditoría y limpieza (jun 2026)
+
+**Limpieza ejecutada** (el paso "archivar" del Camino A, que había quedado pendiente):
+- **Eliminado el sistema v1 muerto** (verificado por GUID: 0 referencias en escena/prefabs/assets):
+  `PlayerMovement`, `MouseLook`, `MovementFeel`, `PlayerFootsteps`, `Weapon`, `WeaponManager`,
+  `WeaponAudio`, `WeaponEffects`, `WeaponRecoil`, `WeaponData`, `Projectile`, `CrosshairArcs`
+  (~1.700 líneas) + `Assets/Weapons/*.asset` + prefabs `Projectile`/`Explosion` viejos.
+  *Git es el archivo*: todo recuperable desde el historial.
+- `HudController` depurado (sin rutas del arsenal viejo) y `CrosshairArcs` → **`HitFeedback`**
+  (solo daño direccional + X de hitmarker, su rol real).
+- `PlayerHealth` sin el puente de i-frames al movimiento viejo (el pack setea `Invulnerable`).
+- **`AudioUtil`** (PickRandom/PlayRandom) unifica el patrón copiado en los audios.
+- `LedgeClimb` usa `Movement.Grounded` (fuente única) en vez de su raycast propio.
+- API obsoleta migrada (`FindFirstObjectByType`/`FindObjectOfType` → `FindAnyObjectByType`).
+- Consola: **0 errores, 0 warnings**.
+
+**⚠️ Deuda conocida (consciente, no urgente):** ~200 líneas ASHFALL viven DENTRO de
+`ThirdParty/.../Movement.cs` (salto/stamina/dash/crouch/parkour) y otros 6 archivos del pack
+(marcadas con `(ASHFALL)`). Si algún día se actualiza el pack, se pisan. Refactor futuro:
+extraerlas a un componente propio por composición. Mientras el pack no se actualice (free
+sample), convivir con ella es la decisión correcta.
 
 ---
 

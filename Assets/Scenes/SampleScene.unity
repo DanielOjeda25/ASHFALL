@@ -2744,6 +2744,30 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   climbDuration: 0.55
+  vaultMaxHeight: 1.2
+  vaultDuration: 0.32
+--- !u!114 &924380296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924380248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c4c5d59ebcce7b4bbb31058c81e4321, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShooterDem.PhysicsCarry
+  grabRange: 2.8
+  maxGrabMass: 60
+  grabMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  holdDistance: 1.9
+  followStrength: 12
+  maxCarrySpeed: 14
+  breakDistance: 4
+  throwSpeed: 13
 --- !u!1 &927565392
 GameObject:
   m_ObjectHideFlags: 0
@@ -3628,6 +3652,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2751027687307977091, guid: 19eadcf8fbed56b4da77ca94c1b4145f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 924380284}
+    - targetCorrespondingSourceObject: {fileID: 2751027687307977091, guid: 19eadcf8fbed56b4da77ca94c1b4145f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 924380296}
     - targetCorrespondingSourceObject: {fileID: 56164245437412244, guid: 19eadcf8fbed56b4da77ca94c1b4145f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1620379816}

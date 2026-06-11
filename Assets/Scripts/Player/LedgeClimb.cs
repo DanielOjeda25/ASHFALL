@@ -28,8 +28,18 @@ namespace ShooterDem
         [Tooltip("Duración total del mantle (segundos).")]
         public float climbDuration = 0.55f;
 
+        [Header("Vault (obstáculos bajos a sprint)")]
+        [Tooltip("Hasta esta altura, ESPRINTANDO, el trepado es un vault rápido que CONSERVA el impulso.")]
+        public float vaultMaxHeight = 1.2f;
+        [Tooltip("Duración del vault (más corto que el mantle: no corta el flow).")]
+        public float vaultDuration = 0.32f;
+
         // Bus estático: "empezó un trepado" (para anim del viewmodel / sonido a futuro).
         public static event System.Action ClimbStarted;
+
+        // Alturas (sobre los pies) a las que se busca pared: pecho para muros altos,
+        // rodilla para obstáculos bajos (cubos ~1m que el rayo del pecho no ve).
+        static readonly float[] WallProbeHeights = { 1.2f, 0.45f };
 
         private Rigidbody body;
         private CapsuleCollider capsule;
@@ -73,12 +83,9 @@ namespace ShooterDem
             }
         }
 
-        bool IsGrounded()
-        {
-            var b = capsule.bounds;
-            return Physics.Raycast(b.center, Vector3.down, b.extents.y + 0.1f,
-                                   climbMask & ~(1 << gameObject.layer), QueryTriggerInteraction.Ignore);
-        }
+        // FUENTE UNICA de verdad del piso: el Movement (filtra paredes/rampas/salto).
+        // Antes habia un raycast propio aqui que duplicaba la regla y podia discrepar.
+        bool IsGrounded() => movement == null || movement.Grounded;
 
         void TryClimb()
         {
@@ -86,10 +93,23 @@ namespace ShooterDem
             Vector3 fwd = transform.forward; fwd.y = 0f; fwd.Normalize();
             float feetY = capsule.bounds.min.y;
 
-            // 1) ¿hay PARED al frente? (rayo a la altura del pecho)
-            Vector3 chest = new Vector3(transform.position.x, feetY + 1.2f, transform.position.z);
-            if (!Physics.Raycast(chest, fwd, out var wall, maxGrabDistance + capsule.radius, mask, QueryTriggerInteraction.Ignore))
-                return;
+            // 1) ¿hay PARED al frente? Sondeamos a DOS alturas: pecho (muros altos) y
+            // rodilla (cubos/cajones de ~1m — el rayo del pecho les pasaba POR ENCIMA y
+            // por eso no se podian trepar). Gana el primer rayo que pegue.
+            // SphereCast (no rayo fino): los bordes angostos o en ángulo que un rayo
+            // esquivaba, una esfera de 15cm los agarra.
+            RaycastHit wall = default;
+            bool found = false;
+            foreach (float probeHeight in WallProbeHeights)
+            {
+                Vector3 origin = new Vector3(transform.position.x, feetY + probeHeight, transform.position.z);
+                if (Physics.SphereCast(origin, 0.15f, fwd, out wall, maxGrabDistance + capsule.radius, mask, QueryTriggerInteraction.Ignore))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return;
 
             // Direccion de TREPADO = perpendicular al muro (no hacia donde miras): el cuerpo
             // sube derecho contra la pared y las manos quedan SOBRE el borde, no en diagonal.
@@ -117,10 +137,22 @@ namespace ShooterDem
             // punto de AGARRE: pegado al muro (el cuerpo se aprieta antes de subir)
             Vector3 hang = wall.point - climbDir * (capsule.radius + 0.06f);
             hang.y = transform.position.y;
-            StartCoroutine(Climb(hang, stand));
+
+            // VAULT: obstaculo bajo + esprintando -> trepado rapido que CONSERVA el impulso
+            // (pasas por encima sin cortar el flow). Mantle clasico para lo demas.
+            bool vault = h <= vaultMaxHeight && movement != null && movement.SprintHeld;
+            float duration = vault ? vaultDuration : climbDuration;
+            Vector3 exitVelocity = Vector3.zero;
+            if (vault)
+            {
+                Vector3 hv = body.linearVelocity; hv.y = 0f;
+                exitVelocity = climbDir * Mathf.Max(hv.magnitude, 4f);   // sale al otro lado con impulso
+            }
+
+            StartCoroutine(Climb(hang, stand, duration, exitVelocity));
         }
 
-        IEnumerator Climb(Vector3 hang, Vector3 stand)
+        IEnumerator Climb(Vector3 hang, Vector3 stand, float climbTime, Vector3 exitVelocity)
         {
             climbing = true;
             movement.Suspended = true;
@@ -135,7 +167,7 @@ namespace ShooterDem
             Vector3 mid = new Vector3(hang.x, target.y + 0.05f, hang.z);   // sube PEGADO al muro
 
             // fase 0 (8%): AGARRE — el cuerpo se aprieta contra el muro (vende el grab)
-            float grabDur = climbDuration * 0.15f, upDur = climbDuration * 0.50f, fwdDur = climbDuration * 0.35f, t = 0f;
+            float grabDur = climbTime * 0.15f, upDur = climbTime * 0.50f, fwdDur = climbTime * 0.35f, t = 0f;
             while (t < grabDur)
             {
                 t += Time.deltaTime;
@@ -159,7 +191,7 @@ namespace ShooterDem
             transform.position = target;
 
             body.isKinematic = false;
-            body.linearVelocity = Vector3.zero;
+            body.linearVelocity = exitVelocity;   // vault: sigue de largo; mantle: queda quieto
             movement.Suspended = false;
             climbing = false;
         }

@@ -100,7 +100,7 @@ public class EnemyAudio : MonoBehaviour
     // Aggro es sticky (una sola vez); al reciclar del pool, OnEnable reactiva el idle.
     void OnAggro()
     {
-        var clip = PickRandom(alertClips);
+        var clip = AudioUtil.PickRandom(alertClips);
         if (loopAlert && clip != null)
         {
             source.clip = clip;
@@ -127,22 +127,12 @@ public class EnemyAudio : MonoBehaviour
     // reproduce en un objeto INDEPENDIENTE pooleado que sobrevive (PooledSfx).
     void OnDied()
     {
-        if (deathClips == null || deathClips.Length == 0) return;
-        var clip = deathClips[Random.Range(0, deathClips.Length)];
+        var clip = AudioUtil.PickRandom(deathClips);
+        if (clip == null) return;
         PooledSfx.Play(deathSfxPrefab, clip, transform.position, deathVolume);
     }
 
     // PlayOneShot mezcla el efecto SOBRE el loop sin cortarlo.
-    void PlayRandom(AudioClip[] clips)
-    {
-        var clip = PickRandom(clips);
-        if (clip != null) source.PlayOneShot(clip);
-    }
-
-    static AudioClip PickRandom(AudioClip[] clips)
-    {
-        if (clips == null || clips.Length == 0) return null;
-        return clips[Random.Range(0, clips.Length)];
-    }
+    void PlayRandom(AudioClip[] clips) => AudioUtil.PlayRandom(source, clips);
 }
 }

@@ -25,6 +25,11 @@ namespace ShooterDem
         // PlayerAudio para el sonido de caida, sin cableado en el Inspector.
         public static event System.Action<float> Landed;
 
+        // Offset vertical EXTRA de los ojos (lo escribe Movement al agacharse). Vive aqui
+        // porque este script es el UNICO que escribe localPosition de la camara cada frame:
+        // si el crouch la moviera por su cuenta, se pisarian.
+        public static float ExtraEyeOffset;
+
         [Header("Bob al moverse (sincronizado con la anim de correr)")]
         [Tooltip("Amplitud del bamboleo a velocidad de CORRER (m).")]
         public float bobRunAmount = 0.035f;
@@ -94,7 +99,12 @@ namespace ShooterDem
                 Vector3 hv = body != null ? body.linearVelocity : Vector3.zero;
                 hv.y = 0f;
                 bool grounded = IsGrounded();   // chequeo real: sin bob en salto/caida/apex
-                float runWeight = grounded ? Mathf.InverseLerp(blendStartSpeed, blendEndSpeed, hv.magnitude) : 0f;
+                // Bob SOLO esprintando de verdad (fuente unica del Movement): caminar a 5 m/s
+                // superaba el umbral de 4.3 y metia bob de carrera caminando (p.ej. agotado
+                // con Shift apretado). El blend por velocidad sigue suavizando la entrada.
+                bool sprinting = movement == null || movement.SprintingEffective;
+                float runWeight = grounded && sprinting
+                    ? Mathf.InverseLerp(blendStartSpeed, blendEndSpeed, hv.magnitude) : 0f;
                 // entrada suave (3/s) pero corte RAPIDO al despegar (8/s): sin trote fantasma en el aire
                 bobAmp = Mathf.MoveTowards(bobAmp, runWeight, Time.deltaTime * (grounded ? 3f : 8f));
                 if (bobAmp > 0.001f)
@@ -108,7 +118,7 @@ namespace ShooterDem
                 }
             }
 
-            transform.localPosition = baseLocalPos + Vector3.up * offset + bob;
+            transform.localPosition = baseLocalPos + Vector3.up * (offset + ExtraEyeOffset) + bob;
         }
     }
 }

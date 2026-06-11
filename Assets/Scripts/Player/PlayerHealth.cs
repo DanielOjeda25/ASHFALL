@@ -21,25 +21,11 @@ public class PlayerHealth : Health
     // a recargas de escena (el nuevo Player se republica en su OnEnable).
     public static PlayerHealth Current { get; private set; }
 
-    private PlayerMovement movement;
-
-    protected override void Awake()
-    {
-        base.Awake();
-        movement = GetComponent<PlayerMovement>();
-    }
-
     void OnEnable()  { Current = this; }
     void OnDisable() { if (Current == this) Current = null; }
 
-    // i-frames mientras dashea: esquivar de verdad evita el dano.
-    // Con nuestro PlayerMovement (arsenal viejo) la invuln viene de su dash.
-    // Con el player del pack (sin PlayerMovement), la maneja el dash del Movement del
-    // pack directamente (setea Invulnerable) -> NO la pisamos aca.
-    void Update()
-    {
-        if (movement != null) Invulnerable = movement.IsDashing;
-    }
+    // i-frames del dash: los setea directamente el Movement del pack (Invulnerable).
+    // (El puente al PlayerMovement viejo se elimino con el arsenal v1 — limpieza Camino A.)
 
     protected override void OnDeath()
     {

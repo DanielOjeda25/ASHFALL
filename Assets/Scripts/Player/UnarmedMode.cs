@@ -44,7 +44,7 @@ namespace ShooterDem
             }
 
             // HUD: sin arma no hay caja de municion.
-            var hud = FindFirstObjectByType<HudController>();
+            var hud = FindAnyObjectByType<HudController>();
             if (hud != null) hud.SetAmmoPanelVisible(!unarmed);
         }
     }
