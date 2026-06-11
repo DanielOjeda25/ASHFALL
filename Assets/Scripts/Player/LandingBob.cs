@@ -43,12 +43,21 @@ namespace ShooterDem
         [Tooltip("Vaiven lateral como fraccion del vertical.")]
         [Range(0f, 1f)] public float swayFactor = 0.6f;
 
+        [Header("Suavizado de escalones (la escalera se siente rampa)")]
+        [Tooltip("Velocidad de recuperación del contra-offset (más alto = alcanza antes al cuerpo).")]
+        public float stepSmoothing = 11f;
+        [Tooltip("Techo del contra-offset (que la cámara nunca quede muy lejos del cuerpo).")]
+        public float stepSmoothMax = 0.45f;
+
         private Rigidbody body;
         private CapsuleCollider bodyCapsule;   // fallback del chequeo de piso (raycast)
         private InfimaGames.LowPolyShooterPack.Movement movement;   // fuente de verdad del grounded
         private Vector3 baseLocalPos;
         private float offset, velocity, prevYVel;
         private float bobTimer, bobAmp;   // fase del paso + amplitud suavizada
+        private float stepSmoothY;        // contra-offset vertical (amortigua escalones)
+        private float prevBodyY;
+        private bool prevGrounded, bodyYInit;
 
         // MISMA fuente de verdad que stamina/salto: el grounded del Movement (que ya filtra
         // paredes por normal). Fallback: raycast bajo la capsula si no hay Movement.
@@ -118,7 +127,27 @@ namespace ShooterDem
                 }
             }
 
-            transform.localPosition = baseLocalPos + Vector3.up * (offset + ExtraEyeOffset) + bob;
+            // --- Suavizado de escalones: la escalera se SIENTE rampa ---
+            // El step assist teletransporta el CUERPO 0.3m hacia arriba por peldano (un
+            // Rigidbody no tiene step offset); la camara lo CONTRARRESTA en el momento y
+            // despues desliza hasta alcanzarlo -> subida continua, sin saltos de vista.
+            // Solo amortigua cambios estando en el piso de forma CONTINUA (subir/bajar
+            // peldanos); saltos y aterrizajes siguen 1:1 (de eso se encarga el resorte).
+            if (body != null && Time.timeScale > 0f)
+            {
+                float bodyY = body.transform.position.y;
+                bool groundedNow = IsGrounded();
+                if (!bodyYInit) { prevBodyY = bodyY; bodyYInit = true; }
+                float dy = bodyY - prevBodyY;
+                if (groundedNow && prevGrounded && Mathf.Abs(dy) > 0.005f && Mathf.Abs(dy) < 0.5f)
+                    stepSmoothY = Mathf.Clamp(stepSmoothY - dy, -stepSmoothMax, stepSmoothMax);
+                prevBodyY = bodyY;
+                prevGrounded = groundedNow;
+                // decaimiento exponencial: rapido al principio, suave al final
+                stepSmoothY = Mathf.Lerp(stepSmoothY, 0f, 1f - Mathf.Exp(-stepSmoothing * Time.deltaTime));
+            }
+
+            transform.localPosition = baseLocalPos + Vector3.up * (offset + ExtraEyeOffset + stepSmoothY) + bob;
         }
     }
 }

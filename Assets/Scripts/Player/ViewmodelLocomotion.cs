@@ -19,17 +19,31 @@ namespace ShooterDem
         private float speed;
         private static readonly int SpeedHash = Animator.StringToHash("Speed");
         private static readonly int ClimbHash = Animator.StringToHash("Climb");
+        private static readonly int CarryingHash = Animator.StringToHash("Carrying");
+        private static readonly int ThrowHash = Animator.StringToHash("Throw");
+
+        private PhysicsCarry carry;   // estado del agarre fisico (manos en pose de sosten)
 
         void Awake()
         {
             animator = GetComponent<Animator>();
             body = GetComponentInParent<Rigidbody>();
+            carry = GetComponentInParent<PhysicsCarry>();
         }
 
-        // Trepado: el sistema (LedgeClimb) avisa por bus estatico -> disparamos la anim.
-        void OnEnable()  { LedgeClimb.ClimbStarted += OnClimb; }
-        void OnDisable() { LedgeClimb.ClimbStarted -= OnClimb; }
-        void OnClimb()   { animator.SetTrigger(ClimbHash); }
+        // Buses estaticos: trepado (LedgeClimb) y lanzamiento (PhysicsCarry).
+        void OnEnable()
+        {
+            LedgeClimb.ClimbStarted += OnClimb;
+            PhysicsCarry.Thrown += OnThrow;
+        }
+        void OnDisable()
+        {
+            LedgeClimb.ClimbStarted -= OnClimb;
+            PhysicsCarry.Thrown -= OnThrow;
+        }
+        void OnClimb() { animator.SetTrigger(ClimbHash); }
+        void OnThrow() { animator.SetTrigger(ThrowHash); }
 
         void Update()
         {
@@ -39,6 +53,10 @@ namespace ShooterDem
             // suavizado: el blend no salta de golpe al frenar/arrancar
             speed = Mathf.Lerp(speed, hv.magnitude, Time.deltaTime * damping);
             animator.SetFloat(SpeedHash, speed);
+
+            // sosteniendo un objeto: manos en pose de carry (estado real de PhysicsCarry)
+            if (carry != null)
+                animator.SetBool(CarryingHash, carry.State == PhysicsCarry.CarryState.Holding);
         }
     }
 }

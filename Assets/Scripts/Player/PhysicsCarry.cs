@@ -40,6 +40,12 @@ namespace ShooterDem
         public enum CarryState { None, CanGrab, Holding }
         public CarryState State { get; private set; }
 
+        [Tooltip("Sacudida de camara al arrojar (kick del esfuerzo).")]
+        public float throwShake = 0.25f;
+
+        // Bus estatico: "arrojo el objeto" (anim de empuje del viewmodel + extras).
+        public static event System.Action Thrown;
+
         private Rigidbody held;          // lo que llevamos (null = manos vacías)
         private bool heldUsedGravity;    // para restaurar el objeto tal como estaba
         private Transform cam;
@@ -132,6 +138,8 @@ namespace ShooterDem
             var rb = held;
             Drop();                                        // restaura gravedad ANTES del envión
             rb.linearVelocity = cam.forward * throwSpeed;  // velocidad constante: arco predecible
+            CameraShake.Add(throwShake);                   // kick de camara: se siente el esfuerzo
+            Thrown?.Invoke();                              // anim de empuje del viewmodel
         }
     }
 }
