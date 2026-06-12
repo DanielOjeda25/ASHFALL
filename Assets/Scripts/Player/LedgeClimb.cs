@@ -36,6 +36,8 @@ namespace ShooterDem
 
         // Bus estático: "empezó un trepado" (para anim del viewmodel / sonido a futuro).
         public static event System.Action ClimbStarted;
+        // Bus estático: "terminó el trepado" (lo escucha WeaponSwitch para re-sacar el arma).
+        public static event System.Action ClimbEnded;
 
         // Alturas (sobre los pies) a las que se busca pared: pecho para muros altos,
         // rodilla para obstáculos bajos (cubos ~1m que el rayo del pecho no ve).
@@ -194,6 +196,7 @@ namespace ShooterDem
             body.linearVelocity = exitVelocity;   // vault: sigue de largo; mantle: queda quieto
             movement.Suspended = false;
             climbing = false;
+            ClimbEnded?.Invoke();   // arriba: WeaponSwitch re-saca el arma que tenías
         }
 
         static float Smooth(float x) => x * x * (3f - 2f * x);   // easing suave (smoothstep)

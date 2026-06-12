@@ -23,11 +23,16 @@ namespace ShooterDem
         public AudioClip switchClip;
         [Range(0f, 1f)] public float switchVolume = 0.9f;
 
+        [Tooltip("Puente al disparo del pack: re-arma cuando el slot equipado es un arma (no desarmado).")]
+        public PackArming packArming;
+
         private int current;
         private bool switching;
         private AudioSource audioSource;   // fuente 2D propia (feedback de interfaz)
+        private int climbReturnSlot = -1;   // arma a re-sacar tras trepar (-1 = no aplica)
 
         private static readonly int HolsterHash = Animator.StringToHash("Holster");
+        private static readonly int ClimbHash = Animator.StringToHash("Climb");
 
         void Start()
         {
@@ -36,6 +41,58 @@ namespace ShooterDem
             audioSource.spatialBlend = 0f;   // 2D
             for (int i = 0; i < slots.Length; i++)
                 if (slots[i] != null) slots[i].SetActive(i == current);
+            ApplyArming();
+        }
+
+        // El slot 0 = desarmado; cualquier otro = un arma -> re-arma el disparo del pack.
+        void ApplyArming()
+        {
+            if (packArming != null) packArming.SetArmed(current != 0);
+        }
+
+        // Trepar con un arma equipada: las manos van al borde (anim de trepado SIN arma) y al
+        // subir se re-saca el arma. Bus estatico de LedgeClimb -> sin cableado de Inspector.
+        void OnEnable()
+        {
+            LedgeClimb.ClimbStarted += OnClimbStarted;
+            LedgeClimb.ClimbEnded += OnClimbEnded;
+        }
+        void OnDisable()
+        {
+            LedgeClimb.ClimbStarted -= OnClimbStarted;
+            LedgeClimb.ClimbEnded -= OnClimbEnded;
+        }
+
+        // Empezo un trepado: si hay arma equipada, guardarla y pasar a desarmado AL INSTANTE
+        // (las manos agarran el borde, sin tiempo de guardar) + disparar la anim de trepado.
+        void OnClimbStarted()
+        {
+            if (slots == null || current == 0) return;   // ya desarmado: trepado normal
+            climbReturnSlot = current;
+            switching = true;                              // bloquea cambios manuales al trepar
+            SetSlotInstant(0);
+            var anim = slots[0] != null ? slots[0].GetComponent<Animator>() : null;
+            if (anim != null) anim.SetTrigger(ClimbHash);
+        }
+
+        // Termino el trepado: vuelve el arma que tenias -> su Animator entra por Draw solo.
+        void OnClimbEnded()
+        {
+            if (climbReturnSlot < 0) return;
+            int back = climbReturnSlot;
+            climbReturnSlot = -1;
+            SetSlotInstant(back);
+            switching = false;
+        }
+
+        // Cambio inmediato de slot (sin holster ni espera): para el trepado.
+        void SetSlotInstant(int idx)
+        {
+            if (idx < 0 || idx >= slots.Length) return;
+            for (int i = 0; i < slots.Length; i++)
+                if (slots[i] != null) slots[i].SetActive(i == idx);
+            current = idx;
+            ApplyArming();
         }
 
         void Update()
@@ -88,6 +145,7 @@ namespace ShooterDem
             // sacar el nuevo: al activarse, su Animator entra por Draw solo
             current = idx;
             if (slots[idx] != null) slots[idx].SetActive(true);
+            ApplyArming();
             switching = false;
         }
 
