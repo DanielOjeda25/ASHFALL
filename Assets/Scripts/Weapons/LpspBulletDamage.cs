@@ -41,8 +41,11 @@ namespace ShooterDem
             var damageable = collision.collider.GetComponentInParent<IDamageable>();
             if (damageable == null)
             {
-                // Superficie (muro/suelo): agujero de bala persistente (pool con tope).
-                if (BulletDecalManager.Instance != null)
+                // Superficie ESTATICA (muro/suelo): agujero de bala persistente (pool con tope).
+                // En objetos con fisica (barriles, props que se mueven o explotan) NO se pega el
+                // decal: si no, al destruirse el objeto la marca queda FLOTANDO en el aire.
+                bool dynamic = collision.rigidbody != null && !collision.rigidbody.isKinematic;
+                if (!dynamic && BulletDecalManager.Instance != null)
                     BulletDecalManager.Instance.Spawn(pos, normal);
                 return;
             }
